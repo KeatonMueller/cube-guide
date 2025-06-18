@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
 
 const Box = () => {
@@ -18,11 +18,22 @@ const Box = () => {
     );
 };
 
+const Controls = () => {
+    const {
+        camera,
+        gl: { domElement },
+    } = useThree();
+
+    return <orbitControls args={[camera, domElement]} />;
+};
+
 const ThreeScene = () => {
     return (
         <Canvas>
             <ambientLight intensity={0.1} />
             <directionalLight color="red" position={[0, 0, 5]} />
+            <axesHelper args={[10]} />
+            <Controls />
             <Box />
         </Canvas>
     );
