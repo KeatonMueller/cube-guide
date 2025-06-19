@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
+import { roundedBoxGeometry } from './cube/roundedBoxGeometry';
+import Cube from './cube/Cube';
 
 const Box = () => {
     const boxRef = useRef<THREE.Mesh>(null!);
@@ -11,8 +13,7 @@ const Box = () => {
     });
 
     return (
-        <mesh ref={boxRef}>
-            <boxGeometry args={[1, 1, 1]} />
+        <mesh geometry={roundedBoxGeometry} ref={boxRef}>
             <meshStandardMaterial color="orange" />
         </mesh>
     );
@@ -34,17 +35,18 @@ const ThreeScene = () => {
             <directionalLight color="red" position={[0, 0, 5]} />
             <axesHelper args={[10]} />
             <Controls />
-            <Box />
+            {/* <Box /> */}
+            <Cube />
         </Canvas>
     );
 };
 
-function App() {
+const App = () => {
     return (
         <div style={{ height: '100vh' }}>
             <ThreeScene />
         </div>
     );
-}
+};
 
 export default App;
