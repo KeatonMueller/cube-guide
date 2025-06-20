@@ -1,12 +1,12 @@
 import * as THREE from 'three';
+import { CUBIE_LENGTH } from '../constants';
 
 /**
  * Rounded Box code taken from forum: https://discourse.threejs.org/t/round-edged-box/1402
  */
-const sideLength = 1.0;
-const width = sideLength; // width of box
-const height = sideLength; // height of box
-const depth = sideLength; // depth of box
+const width = CUBIE_LENGTH; // width of box
+const height = CUBIE_LENGTH; // height of box
+const depth = CUBIE_LENGTH; // depth of box
 const radius0 = 0.1; // radius of curve
 const smoothness = 16; // smoothness of curve
 

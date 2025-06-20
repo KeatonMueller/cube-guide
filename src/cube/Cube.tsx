@@ -1,7 +1,7 @@
+import * as THREE from 'three';
 import Cubie from './Cubie';
-import type { Coords } from './types';
 
-const CUBIE_COORDS: Coords[] = [];
+const CUBIE_COORDS: THREE.Vector3Like[] = [];
 
 for (let x = -1; x <= 1; x++) {
     for (let y = -1; y <= 1; y++) {

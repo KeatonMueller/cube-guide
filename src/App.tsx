@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { roundedBoxGeometry } from './cube/roundedBoxGeometry';
+import { roundedBoxGeometry } from './cube/geometries/roundedBoxGeometry';
 import Cube from './cube/Cube';
 
 const Box = () => {
     const boxRef = useRef<THREE.Mesh>(null!);
 
     useFrame(() => {
-        boxRef.current.rotation.x += 0.005;
-        boxRef.current.rotation.y += 0.01;
+        boxRef.current.rotation.z += 0.005;
+        // boxRef.current.rotation.y += 0.01;
     });
 
     return (

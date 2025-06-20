@@ -1,0 +1,8 @@
+Remembering how rotation directions result in the cube:
+  - Positive X rotation: cube rotates towards you (R')
+  - Negative X rotation: cube rotates away from you (R)
+  - Positive Y rotation: cube rotates left/counter clockwise (U')
+  - Negative Y rotation: cube rotates right/clockwise (U)
+  - Positive Z rotation: cube rotates left (F')
+  - Negative Z rotation: cube rotates right (F)
+So focusing on F, R, U, the rotation direction is the inverse of the cube notation
