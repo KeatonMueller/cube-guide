@@ -72,19 +72,69 @@ export type TLayer = 'F' | 'B' | 'U' | 'D' | 'R' | 'L' | 'M' | 'E' | 'S';
 export const Direction = {
     NORMAL: 'NORMAL',
     INVERTED: 'INVERTED',
-    DOUBLE: 'DOUBLE',
 } as const;
-export type TDirection = 'NORMAL' | 'INVERTED' | 'DOUBLE';
+export type TDirection = 'NORMAL' | 'INVERTED';
 
 export const Variant = {
     NORMAL: 'NORMAL',
     WIDE: 'WIDE',
 } as const;
-export type TVariant = 'NORMAL' | 'Wide';
+export type TVariant = 'NORMAL' | 'WIDE';
 
 // A move consists of a layer, a direction, and a variant
 export type Move = {
     layer: TLayer;
     direction: TDirection;
     variant?: TVariant;
+};
+
+export const MoveMap: Record<string, Move> = {
+    f: {
+        layer: Layer.F,
+        direction: Direction.NORMAL,
+    },
+    F: {
+        layer: Layer.F,
+        direction: Direction.INVERTED,
+    },
+    b: {
+        layer: Layer.B,
+        direction: Direction.NORMAL,
+    },
+    B: {
+        layer: Layer.B,
+        direction: Direction.INVERTED,
+    },
+    u: {
+        layer: Layer.U,
+        direction: Direction.NORMAL,
+    },
+    U: {
+        layer: Layer.U,
+        direction: Direction.INVERTED,
+    },
+    d: {
+        layer: Layer.D,
+        direction: Direction.NORMAL,
+    },
+    D: {
+        layer: Layer.D,
+        direction: Direction.INVERTED,
+    },
+    r: {
+        layer: Layer.R,
+        direction: Direction.NORMAL,
+    },
+    R: {
+        layer: Layer.R,
+        direction: Direction.INVERTED,
+    },
+    l: {
+        layer: Layer.L,
+        direction: Direction.NORMAL,
+    },
+    L: {
+        layer: Layer.L,
+        direction: Direction.INVERTED,
+    },
 };

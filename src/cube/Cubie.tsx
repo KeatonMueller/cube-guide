@@ -12,6 +12,7 @@ import {
 import { getRotationMatrix } from './utils/rotationUtils';
 import { getVector3String } from './utils/vectorUtils';
 import { clearCubieMove } from '../store/moves/movesSlice';
+import { moveToRotationMatrix } from './utils/moveUtils';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -69,18 +70,17 @@ const Cubie = ({ position }: CubieProps) => {
     const posString = getVector3String(cubieRef?.current?.position);
 
     useEffect(() => {
-        if (cubieMoves[posString]) {
-            if (cubieRef.current.position.z === 1) {
-                const rotationMatrix = getRotationMatrix(
-                    AxisVector[POSITIVE].Z,
-                    HALF_PI
-                );
-                const nextPosition = cubieRef.current.position.clone();
-                nextPosition.applyMatrix3(rotationMatrix);
-                cubieRef.current.position.x = Math.round(nextPosition.x);
-                cubieRef.current.position.y = Math.round(nextPosition.y);
-                cubieRef.current.position.z = Math.round(nextPosition.z);
-            }
+        const move = cubieMoves[posString];
+        if (move) {
+            const rotationMatrix = moveToRotationMatrix(move, HALF_PI);
+
+            const nextPosition = cubieRef.current.position.clone();
+            nextPosition.applyMatrix3(rotationMatrix);
+
+            cubieRef.current.position.x = Math.round(nextPosition.x);
+            cubieRef.current.position.y = Math.round(nextPosition.y);
+            cubieRef.current.position.z = Math.round(nextPosition.z);
+
             dispatch(clearCubieMove(posString));
         }
     }, [cubieMoves]);

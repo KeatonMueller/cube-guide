@@ -1,6 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { CUBIE_POSITION_STRINGS, type Move } from '../../cube/constants';
+import {
+    CUBIE_POSITION_STRINGS,
+    CUBIE_POSITIONS,
+    type Move,
+} from '../../cube/constants';
+import { doesMoveApplyToPosition } from '../../cube/utils/moveUtils';
+import { getVector3String } from '../../cube/utils/vectorUtils';
 
 export type CubieMoves = Record<string, Move | null>;
 
@@ -30,20 +36,22 @@ export const movesSlice = createSlice({
         dequeueMove: state => {
             state.moveBuffer.shift();
         },
-        // execute the given move
-        executeMove: (state, action: PayloadAction<Move>) => {
-            // TODO: only set moves for the necessary positions
-            CUBIE_POSITION_STRINGS.forEach(positionString => {
-                state.cubieMoves[positionString] = action.payload;
-            });
-        },
-        // clear out move for an individual cubie
-        clearCubieMove: (state, action: PayloadAction<string>) => {
-            state.cubieMoves[action.payload] = null;
-        },
         // clear the move buffer
         clearMoves: state => {
             state.moveBuffer = [];
+        },
+        // execute the given move by assigning it to the relevant cubies
+        executeMove: (state, action: PayloadAction<Move>) => {
+            const move = action.payload;
+            CUBIE_POSITIONS.forEach(position => {
+                if (doesMoveApplyToPosition(move, position)) {
+                    state.cubieMoves[getVector3String(position)] = move;
+                }
+            });
+        },
+        // clear out the move for an individual cubie
+        clearCubieMove: (state, action: PayloadAction<string>) => {
+            state.cubieMoves[action.payload] = null;
         },
     },
 });

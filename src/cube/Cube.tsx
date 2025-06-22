@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { CUBIE_POSITIONS, type Move } from './constants';
+import { CUBIE_POSITIONS, MoveMap, type Move } from './constants';
 import Cubie from './Cubie';
 import { getVector3String } from './utils/vectorUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,8 +7,8 @@ import {
     selectCubieMovesEmpty,
     selectNextMove,
 } from '../store/moves/movesSelector';
-import { dequeueMove, executeMove } from '../store/moves/movesSlice';
-import { useState } from 'react';
+import { dequeueMove, executeMove, queueMove } from '../store/moves/movesSlice';
+import { useEffect, useState } from 'react';
 
 const Cube = () => {
     const dispatch = useDispatch();
@@ -30,6 +30,19 @@ const Cube = () => {
             setActiveMove(false);
         }
     });
+
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent): void => {
+            if (MoveMap[e.key]) {
+                dispatch(queueMove(MoveMap[e.key]));
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, []);
 
     return (
         <group>

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { AxisVector, POSITIVE } from '../constants';
+import { getVector3String } from './vectorUtils';
 
 /**
  * Rotation matrices to rotate the THREE.Vector3 about an axis by
@@ -53,9 +54,9 @@ const getZRotationMatrix = (theta: number): THREE.Matrix3 => {
  * Key of the map cannot be a THREE.Vector3 so calling toString().
  */
 const AxisToRotationMatrix = {
-    [AxisVector[POSITIVE].X.toString()]: getXRotationMatrix,
-    [AxisVector[POSITIVE].Y.toString()]: getYRotationMatrix,
-    [AxisVector[POSITIVE].Z.toString()]: getZRotationMatrix,
+    [getVector3String(AxisVector[POSITIVE].X)]: getXRotationMatrix,
+    [getVector3String(AxisVector[POSITIVE].Y)]: getYRotationMatrix,
+    [getVector3String(AxisVector[POSITIVE].Z)]: getZRotationMatrix,
 } as const;
 
 /**
@@ -66,5 +67,5 @@ export const getRotationMatrix = (
     axisVector: THREE.Vector3,
     theta: number
 ): THREE.Matrix3 => {
-    return AxisToRotationMatrix[axisVector.toString()](theta);
+    return AxisToRotationMatrix[getVector3String(axisVector)](theta);
 };
