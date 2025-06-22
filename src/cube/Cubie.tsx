@@ -9,6 +9,7 @@ import { selectCubieMoves } from '../store/moves/movesSelector';
 import { getVector3String } from './utils/stringUtils';
 import { clearCubieMove } from '../store/moves/movesSlice';
 import { moveToRotationMatrix } from './utils/moveUtils';
+import { applyMatrix3AndRound } from './utils/vectorUtils';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -35,30 +36,27 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
 };
 
 const Cubie = ({ position }: CubieProps) => {
-    const cubieRef = useRef<THREE.Mesh>(null!);
     const dispatch = useDispatch();
+    const cubieRef = useRef<THREE.Mesh>(null!);
 
     const cubieMoves = useSelector(selectCubieMoves);
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
 
     const posString = getVector3String(cubieRef?.current?.position);
+    const move = cubieMoves[posString];
 
     useEffect(() => {
-        const move = cubieMoves[posString];
         if (move) {
             const rotationMatrix = moveToRotationMatrix(move, HALF_PI);
 
             const nextPosition = cubieRef.current.position.clone();
-            nextPosition.applyMatrix3(rotationMatrix);
-
-            cubieRef.current.position.x = Math.round(nextPosition.x);
-            cubieRef.current.position.y = Math.round(nextPosition.y);
-            cubieRef.current.position.z = Math.round(nextPosition.z);
+            applyMatrix3AndRound(nextPosition, rotationMatrix);
+            cubieRef.current.position.copy(nextPosition);
 
             dispatch(clearCubieMove(posString));
         }
-    }, [cubieMoves]);
+    }, [move]);
 
     const stickerPropsList = getStickerProps(position);
 

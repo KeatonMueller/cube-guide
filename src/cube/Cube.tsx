@@ -4,30 +4,24 @@ import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    selectCubieMovesEmpty,
+    selectIsActiveMove,
     selectNextMove,
 } from '../store/moves/movesSelector';
 import { dequeueMove, executeMove, queueMove } from '../store/moves/movesSlice';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const Cube = () => {
     const dispatch = useDispatch();
 
     const nextMove: Move | null = useSelector(selectNextMove);
-    const cubieMovesEmpty: boolean = useSelector(selectCubieMovesEmpty);
+    const isActiveMove: boolean = useSelector(selectIsActiveMove);
 
-    const [activeMove, setActiveMove] = useState(false);
-
-    const shouldExecuteNextMove = !activeMove && cubieMovesEmpty && nextMove;
-    const moveFinished = activeMove && cubieMovesEmpty;
+    const shouldExecuteNextMove = !isActiveMove && nextMove;
 
     useFrame(() => {
         if (shouldExecuteNextMove) {
             dispatch(executeMove(nextMove));
             dispatch(dequeueMove());
-            setActiveMove(true);
-        } else if (moveFinished) {
-            setActiveMove(false);
         }
     });
 

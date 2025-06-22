@@ -3,25 +3,36 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import {
     CUBIE_POSITION_STRINGS,
     CUBIE_POSITIONS,
+    STICKER_LOCATION_STRINGS,
+    STICKER_LOCATIONS,
     type Move,
 } from '../../cube/constants';
 import { doesMoveApplyToPosition } from '../../cube/utils/moveUtils';
-import { getVector3String } from '../../cube/utils/stringUtils';
+import {
+    getStickerLocationString,
+    getVector3String,
+} from '../../cube/utils/stringUtils';
 
-export type CubieMoves = Record<string, Move | null>;
+export type MoveMap = Record<string, Move | null>;
 
 export type MovesState = {
     moveBuffer: Move[];
-    cubieMoves: CubieMoves;
+    cubieMoves: MoveMap;
+    stickerMoves: MoveMap;
 };
 
 const initialState: MovesState = {
     moveBuffer: [],
     cubieMoves: {},
+    stickerMoves: {},
 };
 
 CUBIE_POSITION_STRINGS.forEach(positionString => {
     initialState.cubieMoves[positionString] = null;
+});
+
+STICKER_LOCATION_STRINGS.forEach(locationString => {
+    initialState.stickerMoves[locationString] = null;
 });
 
 export const movesSlice = createSlice({
@@ -48,10 +59,20 @@ export const movesSlice = createSlice({
                     state.cubieMoves[getVector3String(position)] = move;
                 }
             });
+            STICKER_LOCATIONS.forEach(location => {
+                if (doesMoveApplyToPosition(move, location.cubiePosition)) {
+                    state.stickerMoves[getStickerLocationString(location)] =
+                        move;
+                }
+            });
         },
         // clear out the move for an individual cubie
         clearCubieMove: (state, action: PayloadAction<string>) => {
             state.cubieMoves[action.payload] = null;
+        },
+        // clear out the move for an individual sticker
+        clearStickerMove: (state, action: PayloadAction<string>) => {
+            state.stickerMoves[action.payload] = null;
         },
     },
 });
@@ -59,9 +80,10 @@ export const movesSlice = createSlice({
 export const {
     queueMove,
     dequeueMove,
+    clearMoves,
     executeMove,
     clearCubieMove,
-    clearMoves,
+    clearStickerMove,
 } = movesSlice.actions;
 
 export const movesReducer = movesSlice.reducer;

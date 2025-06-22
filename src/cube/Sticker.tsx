@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
 import {
     EPSILON,
@@ -7,6 +7,12 @@ import {
     HALF_PI,
     type StickerLocation,
 } from './constants';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectStickerMoves } from '../store/moves/movesSelector';
+import { clearStickerMove } from '../store/moves/movesSlice';
+import { moveToRotationMatrix } from './utils/moveUtils';
+import { getStickerLocationString } from './utils/stringUtils';
+import { applyMatrix3AndRound } from './utils/vectorUtils';
 
 export type StickerProps = {
     location: StickerLocation;
@@ -19,13 +25,13 @@ export type StickerProps = {
  * an additional half cubie length in the direction they're facing (plus an epsilon so
  * they're not in the exact same plane as the cubie itself).
  */
-const getStickerPosition = (location: StickerLocation): THREE.Vector3Like => {
+const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
     const { cubiePosition, facingVector } = location;
-    return {
-        x: cubiePosition.x + facingVector.x * (HALF_CUBIE_LENGTH + EPSILON),
-        y: cubiePosition.y + facingVector.y * (HALF_CUBIE_LENGTH + EPSILON),
-        z: cubiePosition.z + facingVector.z * (HALF_CUBIE_LENGTH + EPSILON),
-    };
+    return new THREE.Vector3(
+        cubiePosition.x + facingVector.x * (HALF_CUBIE_LENGTH + EPSILON),
+        cubiePosition.y + facingVector.y * (HALF_CUBIE_LENGTH + EPSILON),
+        cubiePosition.z + facingVector.z * (HALF_CUBIE_LENGTH + EPSILON)
+    );
 };
 
 /**
@@ -36,25 +42,61 @@ const getStickerPosition = (location: StickerLocation): THREE.Vector3Like => {
  * This utility, given a unit vector of where the sticker is facing, returns the rotation
  * needed to face the sticker that way (or 180 degrees the other way, since it's the same).
  */
-const getRotation = (facingVector: THREE.Vector3): THREE.Vector3Like => {
-    return {
-        x: HALF_PI * facingVector.y,
-        y: HALF_PI * facingVector.x,
-        z: 0,
-    };
+const getStickerRotation = (facingVector: THREE.Vector3): THREE.Euler => {
+    return new THREE.Euler(
+        HALF_PI * facingVector.y,
+        HALF_PI * facingVector.x,
+        0,
+        THREE.Euler.DEFAULT_ORDER
+    );
 };
 
 const Sticker = ({ location, color }: StickerProps) => {
-    const stickerRef = useRef<THREE.Mesh>(null!);
+    // initial position and rotation based on props
+    // all future values are stored in local state and the stickerRef
+    const initPosition = getStickerPosition(location);
+    const initRotation = getStickerRotation(location.facingVector);
 
-    const stickerPosition = getStickerPosition(location);
-    const rotation = getRotation(location.facingVector);
+    const dispatch = useDispatch();
+    const stickerRef = useRef<THREE.Mesh>(null!);
+    const stickerMoves = useSelector(selectStickerMoves);
+
+    const [stickerLocation, setStickerLocation] =
+        useState<StickerLocation>(location);
+
+    const locationString = getStickerLocationString(stickerLocation);
+    const move = stickerMoves[locationString];
+
+    useEffect(() => {
+        if (move) {
+            const rotationMatrix = moveToRotationMatrix(move, HALF_PI);
+
+            const nextPosition = stickerLocation.cubiePosition.clone();
+            applyMatrix3AndRound(nextPosition, rotationMatrix);
+
+            const nextFacingVector = stickerLocation.facingVector.clone();
+            applyMatrix3AndRound(nextFacingVector, rotationMatrix);
+
+            const nextLocation: StickerLocation = {
+                cubiePosition: nextPosition,
+                facingVector: nextFacingVector,
+            };
+
+            const nextStickerPosition = getStickerPosition(nextLocation);
+            const nextStickerRotation = getStickerRotation(nextFacingVector);
+            stickerRef.current.position.copy(nextStickerPosition);
+            stickerRef.current.rotation.copy(nextStickerRotation);
+
+            setStickerLocation(nextLocation);
+            dispatch(clearStickerMove(locationString));
+        }
+    }, [move]);
 
     return (
         <mesh
             geometry={roundedSquareGeometry}
-            position={[stickerPosition.x, stickerPosition.y, stickerPosition.z]}
-            rotation={[rotation.x, rotation.y, rotation.z]}
+            position={[initPosition.x, initPosition.y, initPosition.z]}
+            rotation={[initRotation.x, initRotation.y, initRotation.z]}
             ref={stickerRef}
         >
             <meshBasicMaterial color={color} side={THREE.DoubleSide} />
