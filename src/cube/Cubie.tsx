@@ -2,15 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
-import { AxisVector, Color, HALF_PI, NEGATIVE, POSITIVE } from './constants';
+import { Color, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    selectCubieMoves,
-    selectMoveBuffer,
-} from '../store/moves/movesSelector';
-import { getRotationMatrix } from './utils/rotationUtils';
-import { getVector3String } from './utils/vectorUtils';
+import { selectCubieMoves } from '../store/moves/movesSelector';
+import { getVector3String } from './utils/stringUtils';
 import { clearCubieMove } from '../store/moves/movesSlice';
 import { moveToRotationMatrix } from './utils/moveUtils';
 
@@ -18,45 +14,24 @@ export type CubieProps = {
     position: THREE.Vector3;
 };
 
-/**
- * For the given set of initial coordinates of a cubie, get the props for all the stickers
- * that attach to that cubie
- */
-const getStickerProps = (coords: THREE.Vector3Like): StickerProps[] => {
-    const { x, y, z } = coords;
-    const stickerProps: StickerProps[] = [];
-
-    if (x !== 0) {
-        const direction = x > 0 ? POSITIVE : NEGATIVE;
-        const color = x > 0 ? Color.BLUE : Color.GREEN;
-        stickerProps.push({
-            coords,
-            facingVector: AxisVector[direction].X,
+const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
+    return STICKER_LOCATIONS.filter(
+        stickerLocation => stickerLocation.cubiePosition === cubiePosition
+    ).map(stickerLocation => {
+        const { facingVector } = stickerLocation;
+        let color;
+        if (facingVector.x !== 0) {
+            color = facingVector.x > 0 ? Color.BLUE : Color.GREEN;
+        } else if (facingVector.y !== 0) {
+            color = facingVector.y > 0 ? Color.WHITE : Color.YELLOW;
+        } else {
+            color = facingVector.z > 0 ? Color.RED : Color.ORANGE;
+        }
+        return {
+            location: stickerLocation,
             color,
-        });
-    }
-
-    if (y !== 0) {
-        const direction = y > 0 ? POSITIVE : NEGATIVE;
-        const color = y > 0 ? Color.WHITE : Color.YELLOW;
-        stickerProps.push({
-            coords,
-            facingVector: AxisVector[direction].Y,
-            color,
-        });
-    }
-
-    if (z !== 0) {
-        const direction = z > 0 ? POSITIVE : NEGATIVE;
-        const color = z > 0 ? Color.RED : Color.ORANGE;
-        stickerProps.push({
-            coords,
-            facingVector: AxisVector[direction].Z,
-            color,
-        });
-    }
-
-    return stickerProps;
+        };
+    });
 };
 
 const Cubie = ({ position }: CubieProps) => {
@@ -85,7 +60,7 @@ const Cubie = ({ position }: CubieProps) => {
         }
     }, [cubieMoves]);
 
-    // const stickerPropsList = getStickerProps(coords);
+    const stickerPropsList = getStickerProps(position);
 
     return (
         <group>
@@ -98,11 +73,11 @@ const Cubie = ({ position }: CubieProps) => {
                     setHighlighted(prevHighlighted => !prevHighlighted);
                 }}
             >
-                <meshStandardMaterial color={highlighted ? 'red' : 'black'} />
+                <meshStandardMaterial color={highlighted ? 'gold' : 'black'} />
             </mesh>
-            {/* {stickerPropsList.map(stickerProps => (
+            {stickerPropsList.map(stickerProps => (
                 <Sticker {...stickerProps} key={JSON.stringify(stickerProps)} />
-            ))} */}
+            ))}
         </group>
     );
 };

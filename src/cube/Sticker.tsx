@@ -1,28 +1,30 @@
 import * as THREE from 'three';
 import { useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
-import { EPSILON, HALF_CUBIE_LENGTH, HALF_PI } from './constants';
+import {
+    EPSILON,
+    HALF_CUBIE_LENGTH,
+    HALF_PI,
+    type StickerLocation,
+} from './constants';
 
 export type StickerProps = {
-    coords: THREE.Vector3Like;
-    facingVector: THREE.Vector3;
+    location: StickerLocation;
     color: number;
 };
 
 /**
- * Get the sticker's position given its coords and facing vector.
+ * Get the sticker's 3D position given its location.
  * Stickers get rendered in the exact center of a cubie, so they need to be translated
- * an additional half-cube-length in the direction they're facing (plus an epsilon so
+ * an additional half cubie length in the direction they're facing (plus an epsilon so
  * they're not in the exact same plane as the cubie itself).
  */
-const getPosition = (
-    coords: THREE.Vector3Like,
-    facingVector: THREE.Vector3
-): THREE.Vector3Like => {
+const getStickerPosition = (location: StickerLocation): THREE.Vector3Like => {
+    const { cubiePosition, facingVector } = location;
     return {
-        x: coords.x + facingVector.x * (HALF_CUBIE_LENGTH + EPSILON),
-        y: coords.y + facingVector.y * (HALF_CUBIE_LENGTH + EPSILON),
-        z: coords.z + facingVector.z * (HALF_CUBIE_LENGTH + EPSILON),
+        x: cubiePosition.x + facingVector.x * (HALF_CUBIE_LENGTH + EPSILON),
+        y: cubiePosition.y + facingVector.y * (HALF_CUBIE_LENGTH + EPSILON),
+        z: cubiePosition.z + facingVector.z * (HALF_CUBIE_LENGTH + EPSILON),
     };
 };
 
@@ -42,16 +44,16 @@ const getRotation = (facingVector: THREE.Vector3): THREE.Vector3Like => {
     };
 };
 
-const Sticker = ({ coords, facingVector, color }: StickerProps) => {
+const Sticker = ({ location, color }: StickerProps) => {
     const stickerRef = useRef<THREE.Mesh>(null!);
 
-    const position = getPosition(coords, facingVector);
-    const rotation = getRotation(facingVector);
+    const stickerPosition = getStickerPosition(location);
+    const rotation = getRotation(location.facingVector);
 
     return (
         <mesh
             geometry={roundedSquareGeometry}
-            position={[position.x, position.y, position.z]}
+            position={[stickerPosition.x, stickerPosition.y, stickerPosition.z]}
             rotation={[rotation.x, rotation.y, rotation.z]}
             ref={stickerRef}
         >

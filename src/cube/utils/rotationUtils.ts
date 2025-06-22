@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { AxisVector, POSITIVE } from '../constants';
-import { getVector3String } from './vectorUtils';
+import { getVector3String } from './stringUtils';
 
 /**
  * Rotation matrices to rotate the THREE.Vector3 about an axis by

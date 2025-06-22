@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { CUBIE_POSITIONS, MoveMap, type Move } from './constants';
 import Cubie from './Cubie';
-import { getVector3String } from './utils/vectorUtils';
+import { getVector3String } from './utils/stringUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     selectCubieMovesEmpty,

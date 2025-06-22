@@ -6,7 +6,7 @@ import {
     type Move,
 } from '../../cube/constants';
 import { doesMoveApplyToPosition } from '../../cube/utils/moveUtils';
-import { getVector3String } from '../../cube/utils/vectorUtils';
+import { getVector3String } from '../../cube/utils/stringUtils';
 
 export type CubieMoves = Record<string, Move | null>;
 

@@ -45,7 +45,7 @@ export const moveToRotationMatrix = (
         case Layer.D:
         case Layer.L:
         default:
-            rotationDirection = move.direction === Direction.NORMAL ? 1 : 1;
+            rotationDirection = move.direction === Direction.NORMAL ? 1 : -1;
             break;
     }
 
