@@ -1,13 +1,21 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
-import { AxisVector, Color, NEGATIVE, POSITIVE } from './constants';
+import { AxisVector, Color, HALF_PI, NEGATIVE, POSITIVE } from './constants';
 import Sticker from './Sticker';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    selectCubieMoves,
+    selectMoveBuffer,
+} from '../store/moves/movesSelector';
+import { getRotationMatrix } from './utils/rotationUtils';
+import { getVector3String } from './utils/vectorUtils';
+import { clearCubieMove } from '../store/moves/movesSlice';
 
-export interface CubieProps {
-    coords: THREE.Vector3Like;
-}
+export type CubieProps = {
+    position: THREE.Vector3;
+};
 
 /**
  * For the given set of initial coordinates of a cubie, get the props for all the stickers
@@ -50,23 +58,51 @@ const getStickerProps = (coords: THREE.Vector3Like): StickerProps[] => {
     return stickerProps;
 };
 
-const Cubie = ({ coords }: CubieProps) => {
+const Cubie = ({ position }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
-    const { x, y, z } = coords;
-    const stickerPropsList = getStickerProps(coords);
+    const dispatch = useDispatch();
+
+    const cubieMoves = useSelector(selectCubieMoves);
+
+    const [highlighted, setHighlighted] = useState<boolean>(false);
+
+    const posString = getVector3String(cubieRef?.current?.position);
+
+    useEffect(() => {
+        if (cubieMoves[posString]) {
+            if (cubieRef.current.position.z === 1) {
+                const rotationMatrix = getRotationMatrix(
+                    AxisVector[POSITIVE].Z,
+                    HALF_PI
+                );
+                const nextPosition = cubieRef.current.position.clone();
+                nextPosition.applyMatrix3(rotationMatrix);
+                cubieRef.current.position.x = Math.round(nextPosition.x);
+                cubieRef.current.position.y = Math.round(nextPosition.y);
+                cubieRef.current.position.z = Math.round(nextPosition.z);
+            }
+            dispatch(clearCubieMove(posString));
+        }
+    }, [cubieMoves]);
+
+    // const stickerPropsList = getStickerProps(coords);
 
     return (
         <group>
             <mesh
                 geometry={roundedBoxGeometry}
-                position={[x, y, z]}
+                position={position}
                 ref={cubieRef}
+                onClick={e => {
+                    e.stopPropagation();
+                    setHighlighted(prevHighlighted => !prevHighlighted);
+                }}
             >
-                <meshStandardMaterial color="black" />
+                <meshStandardMaterial color={highlighted ? 'red' : 'black'} />
             </mesh>
-            {stickerPropsList.map(stickerProps => (
+            {/* {stickerPropsList.map(stickerProps => (
                 <Sticker {...stickerProps} key={JSON.stringify(stickerProps)} />
-            ))}
+            ))} */}
         </group>
     );
 };

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getVector3String } from './utils/vectorUtils';
 
 export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
@@ -7,6 +8,24 @@ export const EPSILON = 0.001;
 
 export const POSITIVE = 'POSITIVE';
 export const NEGATIVE = 'NEGATIVE';
+
+/**
+ * Positions of all the cubies in 3D space represented as Vector3s
+ */
+export const CUBIE_POSITIONS: THREE.Vector3[] = [];
+
+for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+        for (let z = -1; z <= 1; z++) {
+            if (x !== 0 || y !== 0 || z !== 0)
+                CUBIE_POSITIONS.push(new THREE.Vector3(x, y, z));
+        }
+    }
+}
+
+export const CUBIE_POSITION_STRINGS: string[] = CUBIE_POSITIONS.map(position =>
+    getVector3String(position)
+);
 
 /**
  * Axis vector enum
@@ -33,4 +52,39 @@ export const Color = {
     GREEN: 0x00ff00,
 } as const;
 
-export const QUARTER_TURN_RADIANS = Math.PI * 0.5;
+// half pi is a quarter turn in radians, which is something we'll
+// be doing a lot of so store a convenience constant
+export const HALF_PI = Math.PI * 0.5;
+
+export const Layer = {
+    F: 'F',
+    B: 'B',
+    U: 'U',
+    D: 'D',
+    R: 'R',
+    L: 'L',
+    M: 'M',
+    E: 'E',
+    S: 'S',
+} as const;
+export type TLayer = 'F' | 'B' | 'U' | 'D' | 'R' | 'L' | 'M' | 'E' | 'S';
+
+export const Direction = {
+    NORMAL: 'NORMAL',
+    INVERTED: 'INVERTED',
+    DOUBLE: 'DOUBLE',
+} as const;
+export type TDirection = 'NORMAL' | 'INVERTED' | 'DOUBLE';
+
+export const Variant = {
+    NORMAL: 'NORMAL',
+    WIDE: 'WIDE',
+} as const;
+export type TVariant = 'NORMAL' | 'Wide';
+
+// A move consists of a layer, a direction, and a variant
+export type Move = {
+    layer: TLayer;
+    direction: TDirection;
+    variant?: TVariant;
+};

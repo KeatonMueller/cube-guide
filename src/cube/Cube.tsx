@@ -1,21 +1,40 @@
-import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
+import { CUBIE_POSITIONS, type Move } from './constants';
 import Cubie from './Cubie';
-
-const CUBIE_COORDS: THREE.Vector3Like[] = [];
-
-for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
-        for (let z = -1; z <= 1; z++) {
-            if (x !== 0 || y !== 0 || z !== 0) CUBIE_COORDS.push({ x, y, z });
-        }
-    }
-}
+import { getVector3String } from './utils/vectorUtils';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    selectCubieMovesEmpty,
+    selectNextMove,
+} from '../store/moves/movesSelector';
+import { dequeueMove, executeMove } from '../store/moves/movesSlice';
+import { useState } from 'react';
 
 const Cube = () => {
+    const dispatch = useDispatch();
+
+    const nextMove: Move | null = useSelector(selectNextMove);
+    const cubieMovesEmpty: boolean = useSelector(selectCubieMovesEmpty);
+
+    const [activeMove, setActiveMove] = useState(false);
+
+    const shouldExecuteNextMove = !activeMove && cubieMovesEmpty && nextMove;
+    const moveFinished = activeMove && cubieMovesEmpty;
+
+    useFrame(() => {
+        if (shouldExecuteNextMove) {
+            dispatch(executeMove(nextMove));
+            dispatch(dequeueMove());
+            setActiveMove(true);
+        } else if (moveFinished) {
+            setActiveMove(false);
+        }
+    });
+
     return (
         <group>
-            {CUBIE_COORDS.map(coords => (
-                <Cubie coords={coords} key={JSON.stringify(coords)} />
+            {CUBIE_POSITIONS.map(position => (
+                <Cubie position={position} key={getVector3String(position)} />
             ))}
         </group>
     );

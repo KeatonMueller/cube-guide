@@ -1,0 +1,14 @@
+Why would I ever choose to use redux for my small scale application?
+
+Two main reasons:
+  1. Familiarity
+  2. Performance
+
+I have used redux at work a fair amount, so I feel comfortable using
+it and don't mind the boilerplate too much.
+
+Additionally, when researching alternatives (primarily the native useReducer)
+I found this reddit post from a redux maintainer:
+https://www.reddit.com/r/reactjs/comments/10uf6vf/to_redux_or_not_to_redux_to_usereducer_or_usestate/j7bzhg3/
+The limitation of both passing props and using context causing child components
+to re-render is a big thing that I'd like to avoid, so I decided to go with redux.

@@ -1,14 +1,13 @@
 import * as THREE from 'three';
 import { useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
-import { EPSILON, HALF_CUBIE_LENGTH, QUARTER_TURN_RADIANS } from './constants';
-import { useFrame } from '@react-three/fiber';
+import { EPSILON, HALF_CUBIE_LENGTH, HALF_PI } from './constants';
 
-export interface StickerProps {
+export type StickerProps = {
     coords: THREE.Vector3Like;
     facingVector: THREE.Vector3;
     color: number;
-}
+};
 
 /**
  * Get the sticker's position given its coords and facing vector.
@@ -37,8 +36,8 @@ const getPosition = (
  */
 const getRotation = (facingVector: THREE.Vector3): THREE.Vector3Like => {
     return {
-        x: QUARTER_TURN_RADIANS * facingVector.y,
-        y: QUARTER_TURN_RADIANS * facingVector.x,
+        x: HALF_PI * facingVector.y,
+        y: HALF_PI * facingVector.x,
         z: 0,
     };
 };
