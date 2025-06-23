@@ -192,4 +192,28 @@ export const MoveMap: Record<string, Move> = {
         layer: Layer.L,
         direction: Direction.INVERTED,
     },
+    m: {
+        layer: Layer.M,
+        direction: Direction.NORMAL,
+    },
+    M: {
+        layer: Layer.M,
+        direction: Direction.INVERTED,
+    },
+    e: {
+        layer: Layer.E,
+        direction: Direction.NORMAL,
+    },
+    E: {
+        layer: Layer.E,
+        direction: Direction.INVERTED,
+    },
+    s: {
+        layer: Layer.S,
+        direction: Direction.NORMAL,
+    },
+    S: {
+        layer: Layer.S,
+        direction: Direction.INVERTED,
+    },
 };
