@@ -8,6 +8,7 @@ export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
 export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
 export const EPSILON = 0.001;
+export const ANIMATION_SPEED = 7;
 
 export const POSITIVE = 'POSITIVE';
 export const NEGATIVE = 'NEGATIVE';
@@ -27,6 +28,38 @@ export const AxisVector = {
         Z: new THREE.Vector3(0, 0, -1),
     },
 } as const;
+
+/**
+ * Labels for each axis. Values match the property names of THREE.Vector3s.
+ */
+export const AxisLabel = {
+    X: 'x',
+    Y: 'y',
+    Z: 'z',
+} as const;
+export type TAxisLabel =
+    | typeof AxisLabel.X
+    | typeof AxisLabel.Y
+    | typeof AxisLabel.Z;
+
+/**
+ * Axis values used in a 3x3 coordinate space centered at 0.
+ */
+export const AxisValue = {
+    NEGATIVE: -1,
+    ZERO: 0,
+    POSITIVE: 1,
+} as const;
+export type TAxisValue =
+    | typeof AxisValue.NEGATIVE
+    | typeof AxisValue.ZERO
+    | typeof AxisValue.POSITIVE;
+
+export const AXIS_LABEL_TO_VECTOR = {
+    [AxisLabel.X]: AxisVector[POSITIVE].X,
+    [AxisLabel.Y]: AxisVector[POSITIVE].Y,
+    [AxisLabel.Z]: AxisVector[POSITIVE].Z,
+};
 
 /**
  * Positions of all the cubies in 3D space represented as Vector3s.
@@ -124,96 +157,102 @@ export const Layer = {
 } as const;
 export type TLayer = 'F' | 'B' | 'U' | 'D' | 'R' | 'L' | 'M' | 'E' | 'S';
 
-export const Direction = {
-    NORMAL: 'NORMAL',
-    INVERTED: 'INVERTED',
-} as const;
-export type TDirection = 'NORMAL' | 'INVERTED';
-
-export const Variant = {
-    NORMAL: 'NORMAL',
-    WIDE: 'WIDE',
-} as const;
-export type TVariant = 'NORMAL' | 'WIDE';
-
-// A move consists of a layer, a direction, and a variant
+// A move consists of a rotation axis, an axis identifier (-1, 0, 1), and a target theta
 export type Move = {
-    layer: TLayer;
-    direction: TDirection;
-    variant?: TVariant;
+    axisLabel: TAxisLabel;
+    axisValue: TAxisValue;
+    targetTheta: number;
 };
 
 export const MoveMap: Record<string, Move> = {
     f: {
-        layer: Layer.F,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: -HALF_PI,
     },
     F: {
-        layer: Layer.F,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: HALF_PI,
     },
     b: {
-        layer: Layer.B,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: HALF_PI,
     },
     B: {
-        layer: Layer.B,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: -HALF_PI,
     },
     u: {
-        layer: Layer.U,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: -HALF_PI,
     },
     U: {
-        layer: Layer.U,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: HALF_PI,
     },
     d: {
-        layer: Layer.D,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: HALF_PI,
     },
     D: {
-        layer: Layer.D,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: -HALF_PI,
     },
     r: {
-        layer: Layer.R,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: -HALF_PI,
     },
     R: {
-        layer: Layer.R,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.POSITIVE,
+        targetTheta: HALF_PI,
     },
     l: {
-        layer: Layer.L,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: HALF_PI,
     },
     L: {
-        layer: Layer.L,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.NEGATIVE,
+        targetTheta: -HALF_PI,
     },
     m: {
-        layer: Layer.M,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.ZERO,
+        targetTheta: HALF_PI,
     },
     M: {
-        layer: Layer.M,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.X,
+        axisValue: AxisValue.ZERO,
+        targetTheta: -HALF_PI,
     },
     e: {
-        layer: Layer.E,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.ZERO,
+        targetTheta: HALF_PI,
     },
     E: {
-        layer: Layer.E,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Y,
+        axisValue: AxisValue.ZERO,
+        targetTheta: -HALF_PI,
     },
     s: {
-        layer: Layer.S,
-        direction: Direction.NORMAL,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.ZERO,
+        targetTheta: -HALF_PI,
     },
     S: {
-        layer: Layer.S,
-        direction: Direction.INVERTED,
+        axisLabel: AxisLabel.Z,
+        axisValue: AxisValue.ZERO,
+        targetTheta: HALF_PI,
     },
 };

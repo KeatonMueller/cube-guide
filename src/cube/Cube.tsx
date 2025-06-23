@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     selectIsActiveMove,
     selectNextMove,
-} from '../store/moves/movesSelector';
+} from '../store/moves/movesSelectors';
 import { dequeueMove, executeMove, queueMove } from '../store/moves/movesSlice';
 import { useEffect } from 'react';
 

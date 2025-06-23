@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
 import {
     EPSILON,
@@ -8,7 +8,7 @@ import {
     type StickerLocation,
 } from './constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectStickerMoves } from '../store/moves/movesSelector';
+import { selectStickerMoves } from '../store/moves/movesSelectors';
 import { clearStickerMove } from '../store/moves/movesSlice';
 import { moveToRotationMatrix } from './utils/moveUtils';
 import { getStickerLocationString } from './utils/stringUtils';

@@ -45,6 +45,6 @@ export const selectAreStickerMovesActive = createSelector(
 export const selectIsActiveMove = createSelector(
     [selectAreCubieMovesActive, selectAreStickerMovesActive],
     (cubieMovesActive, stickerMovesActive): boolean => {
-        return cubieMovesActive || stickerMovesActive;
+        return cubieMovesActive; //|| stickerMovesActive;
     }
 );

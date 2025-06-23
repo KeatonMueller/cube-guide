@@ -7,7 +7,7 @@ import {
     STICKER_LOCATIONS,
     type Move,
 } from '../../cube/constants';
-import { doesMoveApplyToPosition } from '../../cube/utils/moveUtils';
+import { doesMoveTargetPosition } from '../../cube/utils/moveUtils';
 import {
     getStickerLocationString,
     getVector3String,
@@ -54,13 +54,14 @@ export const movesSlice = createSlice({
         // execute the given move by assigning it to the relevant cubies
         executeMove: (state, action: PayloadAction<Move>) => {
             const move = action.payload;
+
             CUBIE_POSITIONS.forEach(position => {
-                if (doesMoveApplyToPosition(move, position)) {
+                if (doesMoveTargetPosition(move, position)) {
                     state.cubieMoves[getVector3String(position)] = move;
                 }
             });
             STICKER_LOCATIONS.forEach(location => {
-                if (doesMoveApplyToPosition(move, location.cubiePosition)) {
+                if (doesMoveTargetPosition(move, location.cubiePosition)) {
                     state.stickerMoves[getStickerLocationString(location)] =
                         move;
                 }

@@ -9,6 +9,13 @@ export const applyMatrix3AndRound = (
     matrix: THREE.Matrix3
 ): void => {
     vector.applyMatrix3(matrix);
+    roundVector3(vector);
+};
+
+/**
+ * Round the given Vector3's x, y, and z values.
+ */
+export const roundVector3 = (vector: THREE.Vector3): void => {
     vector.x = Math.round(vector.x);
     vector.y = Math.round(vector.y);
     vector.z = Math.round(vector.z);
