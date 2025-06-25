@@ -3,10 +3,14 @@ import {
     CUBIE_POSITION_STRINGS,
     CUBIE_POSITIONS,
     STICKER_LOCATION_STRINGS,
+    STICKER_LOCATIONS,
     type Move,
 } from '../../cube/constants';
 import { doesMoveTargetPosition } from '../../cube/utils/moveUtils';
-import { getVector3String } from '../../cube/utils/stringUtils';
+import {
+    getStickerLocationString,
+    getVector3String,
+} from '../../cube/utils/stringUtils';
 
 export type Actions = {
     queueMove: (move: Move) => void;
@@ -59,11 +63,29 @@ export const useMovesStore = create<MovesState>(set => ({
                     }
                 });
 
+                const stickerMoves: MoveMap = {};
+                STICKER_LOCATIONS.forEach(stickerLocation => {
+                    if (
+                        doesMoveTargetPosition(
+                            move,
+                            stickerLocation.cubiePosition
+                        )
+                    ) {
+                        stickerMoves[
+                            getStickerLocationString(stickerLocation)
+                        ] = move;
+                    }
+                });
+
                 return {
                     ...state,
                     cubieMoves: {
                         ...state.cubieMoves,
                         ...cubieMoves,
+                    },
+                    stickerMoves: {
+                        ...state.stickerMoves,
+                        ...stickerMoves,
                     },
                 };
             }),

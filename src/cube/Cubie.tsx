@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useRef, useState } from 'react';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
 import {
@@ -55,32 +55,31 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
     const move = cubieMoves[posString];
 
     useFrame((_: RootState, delta: number) => {
-        if (move) {
-            const { axisLabel, targetTheta } = move;
+        if (!move) return;
+        const { axisLabel, targetTheta } = move;
 
-            const sign = targetTheta / Math.abs(targetTheta);
-            const deltaTheta = sign * delta * ANIMATION_SPEED;
-            const rotationMatrix = moveToRotationMatrix(move, deltaTheta);
+        const sign = targetTheta / Math.abs(targetTheta);
+        const deltaTheta = sign * delta * ANIMATION_SPEED;
+        const rotationMatrix = moveToRotationMatrix(move, deltaTheta);
 
-            const nextPosition = cubieRef.current.position.clone();
-            nextPosition.applyMatrix3(rotationMatrix);
-            cubieRef.current.position.copy(nextPosition);
+        const nextPosition = cubieRef.current.position.clone();
+        nextPosition.applyMatrix3(rotationMatrix);
+        cubieRef.current.position.copy(nextPosition);
 
-            const nextTheta = cubieRef.current.rotation[axisLabel] + deltaTheta;
-            cubieRef.current.rotation[axisLabel] = nextTheta;
+        const nextTheta = cubieRef.current.rotation[axisLabel] + deltaTheta;
+        cubieRef.current.rotation[axisLabel] = nextTheta;
 
-            if (Math.abs(nextTheta) >= Math.abs(targetTheta)) {
-                // if the animation that just completed was a full quarter turn,
-                // round the current position vector and store it
-                if (Math.abs(targetTheta) === HALF_PI) {
-                    roundVector3(cubieRef.current.position);
-                    setPosition(cubieRef.current.position.clone());
-                }
-                // reset theta trackers and flag move as complete
-                cubieRef.current.rotation[axisLabel] = 0;
-
-                clearCubieMove(posString);
+        if (Math.abs(nextTheta) >= Math.abs(targetTheta)) {
+            // if the animation that just completed was a full quarter turn,
+            // round the current position vector and store it
+            if (Math.abs(targetTheta) === HALF_PI) {
+                roundVector3(cubieRef.current.position);
+                setPosition(cubieRef.current.position.clone());
             }
+            // reset theta trackers and flag move as complete
+            cubieRef.current.rotation[axisLabel] = 0;
+
+            clearCubieMove(posString);
         }
     });
 
@@ -99,9 +98,9 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
             >
                 <meshStandardMaterial color={highlighted ? 'gold' : 'black'} />
             </mesh>
-            {/* {stickerPropsList.map(stickerProps => (
+            {stickerPropsList.map(stickerProps => (
                 <Sticker {...stickerProps} key={JSON.stringify(stickerProps)} />
-            ))} */}
+            ))}
         </group>
     );
 };
