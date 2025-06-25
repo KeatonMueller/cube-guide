@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import * as THREE from 'three';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
@@ -9,13 +9,12 @@ import {
     STICKER_LOCATIONS,
 } from './constants';
 import Sticker from './Sticker';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectCubieMoves } from '../store/moves/movesSelectors';
 import { getVector3String } from './utils/stringUtils';
-import { clearCubieMove } from '../store/moves/movesSlice';
 import { moveToRotationMatrix } from './utils/moveUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
+import { useMovesStore } from '../store/moves/store';
+import { selectCubieMoves } from '../store/moves/selectors';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -42,27 +41,22 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
 };
 
 const Cubie = ({ position: initPosition }: CubieProps) => {
-    const dispatch = useDispatch();
     const cubieRef = useRef<THREE.Mesh>(null!);
 
-    const cubieMoves = useSelector(selectCubieMoves);
+    const cubieMoves = useMovesStore(selectCubieMoves);
+    const { clearCubieMove } = useMovesStore(state => state.actions);
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
+    // the cubieRef's position stores the realtime position of the mesh, while this
+    // stores the coordinate location of the mesh, only updated after a move finishes
     const [position, setPosition] = useState<THREE.Vector3>(initPosition);
-    const [targetTheta, setTargetTheta] = useState<number>(0);
 
     const posString = getVector3String(position);
     const move = cubieMoves[posString];
 
-    useEffect(() => {
-        if (move && targetTheta === 0) {
-            setTargetTheta(move.targetTheta);
-        }
-    }, [move]);
-
     useFrame((_: RootState, delta: number) => {
-        if (move && targetTheta !== 0) {
-            const { axisLabel } = move;
+        if (move) {
+            const { axisLabel, targetTheta } = move;
 
             const sign = targetTheta / Math.abs(targetTheta);
             const deltaTheta = sign * delta * ANIMATION_SPEED;
@@ -80,12 +74,12 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
                 // round the current position vector and store it
                 if (Math.abs(targetTheta) === HALF_PI) {
                     roundVector3(cubieRef.current.position);
-                    setPosition(cubieRef.current.position);
+                    setPosition(cubieRef.current.position.clone());
                 }
                 // reset theta trackers and flag move as complete
                 cubieRef.current.rotation[axisLabel] = 0;
-                setTargetTheta(0);
-                dispatch(clearCubieMove(posString));
+
+                clearCubieMove(posString);
             }
         }
     });

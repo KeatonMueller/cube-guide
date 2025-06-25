@@ -7,12 +7,14 @@ import {
     HALF_PI,
     type StickerLocation,
 } from './constants';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectStickerMoves } from '../store/moves/movesSelectors';
-import { clearStickerMove } from '../store/moves/movesSlice';
 import { moveToRotationMatrix } from './utils/moveUtils';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
+import { useMovesStore } from '../store/moves/store';
+import {
+    selectMovesActions,
+    selectStickerMoves,
+} from '../store/moves/selectors';
 
 export type StickerProps = {
     location: StickerLocation;
@@ -57,9 +59,11 @@ const Sticker = ({ location, color }: StickerProps) => {
     const initPosition = getStickerPosition(location);
     const initRotation = getStickerRotation(location.facingVector);
 
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const stickerRef = useRef<THREE.Mesh>(null!);
-    const stickerMoves = useSelector(selectStickerMoves);
+    // const stickerMoves = useSelector(selectStickerMoves);
+    const stickerMoves = useMovesStore(selectStickerMoves);
+    const { clearStickerMove } = useMovesStore(selectMovesActions);
 
     const [stickerLocation, setStickerLocation] =
         useState<StickerLocation>(location);
@@ -69,7 +73,7 @@ const Sticker = ({ location, color }: StickerProps) => {
 
     useEffect(() => {
         if (move) {
-            const rotationMatrix = moveToRotationMatrix(move, HALF_PI);
+            const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
 
             const nextPosition = stickerLocation.cubiePosition.clone();
             applyMatrix3AndRound(nextPosition, rotationMatrix);
@@ -88,7 +92,7 @@ const Sticker = ({ location, color }: StickerProps) => {
             stickerRef.current.rotation.copy(nextStickerRotation);
 
             setStickerLocation(nextLocation);
-            dispatch(clearStickerMove(locationString));
+            clearStickerMove(locationString);
         }
     }, [move]);
 

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AXIS_LABEL_TO_VECTOR, type Move } from '../constants';
+import { AXIS_LABEL_TO_VECTOR, type Move, type TAxisValue } from '../constants';
 import { getRotationMatrix } from './rotationUtils';
 
 /**
@@ -22,5 +22,5 @@ export const doesMoveTargetPosition = (
     move: Move,
     position: THREE.Vector3
 ): boolean => {
-    return position[move.axisLabel] === move.axisValue;
+    return move.axisValues.includes(position[move.axisLabel] as TAxisValue);
 };

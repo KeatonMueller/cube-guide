@@ -160,99 +160,99 @@ export type TLayer = 'F' | 'B' | 'U' | 'D' | 'R' | 'L' | 'M' | 'E' | 'S';
 // A move consists of a rotation axis, an axis identifier (-1, 0, 1), and a target theta
 export type Move = {
     axisLabel: TAxisLabel;
-    axisValue: TAxisValue;
+    axisValues: TAxisValue[];
     targetTheta: number;
 };
 
 export const MoveMap: Record<string, Move> = {
     f: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: -HALF_PI,
     },
     F: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: HALF_PI,
     },
     b: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: HALF_PI,
     },
     B: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: -HALF_PI,
     },
     u: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: -HALF_PI,
     },
     U: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: HALF_PI,
     },
     d: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: HALF_PI,
     },
     D: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: -HALF_PI,
     },
     r: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: -HALF_PI,
     },
     R: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.POSITIVE,
+        axisValues: [AxisValue.POSITIVE],
         targetTheta: HALF_PI,
     },
     l: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: HALF_PI,
     },
     L: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.NEGATIVE,
+        axisValues: [AxisValue.NEGATIVE],
         targetTheta: -HALF_PI,
     },
     m: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: HALF_PI,
     },
     M: {
         axisLabel: AxisLabel.X,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: -HALF_PI,
     },
     e: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: HALF_PI,
     },
     E: {
         axisLabel: AxisLabel.Y,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: -HALF_PI,
     },
     s: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: -HALF_PI,
     },
     S: {
         axisLabel: AxisLabel.Z,
-        axisValue: AxisValue.ZERO,
+        axisValues: [AxisValue.ZERO],
         targetTheta: HALF_PI,
     },
 };

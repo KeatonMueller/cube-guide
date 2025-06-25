@@ -1,19 +1,15 @@
-import { createSelector } from '@reduxjs/toolkit';
-import type { AppState } from '../store';
+import type { MovesState } from './store';
 import {
     CUBIE_POSITION_STRINGS,
     STICKER_LOCATION_STRINGS,
     type Move,
 } from '../../cube/constants';
+import { createSelector } from 'reselect';
 
-export const selectMoveBuffer = (appState: AppState) =>
-    appState.moves.moveBuffer;
-
-export const selectCubieMoves = (appState: AppState) =>
-    appState.moves.cubieMoves;
-
-export const selectStickerMoves = (appState: AppState) =>
-    appState.moves.stickerMoves;
+export const selectMovesActions = (state: MovesState) => state.actions;
+export const selectMoveBuffer = (state: MovesState) => state.moveBuffer;
+export const selectCubieMoves = (state: MovesState) => state.cubieMoves;
+export const selectStickerMoves = (state: MovesState) => state.stickerMoves;
 
 export const selectNextMove = createSelector(
     [selectMoveBuffer],
@@ -45,6 +41,6 @@ export const selectAreStickerMovesActive = createSelector(
 export const selectIsActiveMove = createSelector(
     [selectAreCubieMovesActive, selectAreStickerMovesActive],
     (cubieMovesActive, stickerMovesActive): boolean => {
-        return cubieMovesActive; //|| stickerMovesActive;
+        return cubieMovesActive || stickerMovesActive;
     }
 );

@@ -1,34 +1,33 @@
-import { useFrame } from '@react-three/fiber';
-import { CUBIE_POSITIONS, MoveMap, type Move } from './constants';
+import { CUBIE_POSITIONS, MoveMap } from './constants';
 import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useMovesStore } from '../store/moves/store';
 import {
+    selectMovesActions,
     selectIsActiveMove,
     selectNextMove,
-} from '../store/moves/movesSelectors';
-import { dequeueMove, executeMove, queueMove } from '../store/moves/movesSlice';
-import { useEffect } from 'react';
+} from '../store/moves/selectors';
 
 const Cube = () => {
-    const dispatch = useDispatch();
-
-    const nextMove: Move | null = useSelector(selectNextMove);
-    const isActiveMove: boolean = useSelector(selectIsActiveMove);
+    const nextMove = useMovesStore(selectNextMove);
+    const isActiveMove = useMovesStore(selectIsActiveMove);
+    const { executeMove, dequeueMove, queueMove } =
+        useMovesStore(selectMovesActions);
 
     const shouldExecuteNextMove = !isActiveMove && nextMove;
 
-    useFrame(() => {
+    useEffect(() => {
         if (shouldExecuteNextMove) {
-            dispatch(executeMove(nextMove));
-            dispatch(dequeueMove());
+            executeMove(nextMove);
+            dequeueMove();
         }
-    });
+    }, [shouldExecuteNextMove, nextMove]);
 
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent): void => {
             if (MoveMap[e.key]) {
-                dispatch(queueMove(MoveMap[e.key]));
+                queueMove(MoveMap[e.key]);
             }
         };
         document.addEventListener('keydown', onKeyDown);
