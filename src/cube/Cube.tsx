@@ -2,13 +2,12 @@ import { CUBIE_POSITIONS, MoveMap } from './constants';
 import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
 import { useEffect } from 'react';
-import { useMovesStore } from '../store/moves/store';
-import { selectMovesActions, selectIsActiveMove, selectNextMove } from '../store/moves/selectors';
+import { useIsActiveMove, useMovesActions, useNextMove } from '../store/moves/store';
 
 const Cube = () => {
-    const nextMove = useMovesStore(selectNextMove);
-    const isActiveMove = useMovesStore(selectIsActiveMove);
-    const { executeMove, dequeueMove, queueMove } = useMovesStore(selectMovesActions);
+    const nextMove = useNextMove();
+    const isActiveMove = useIsActiveMove();
+    const { executeMove, dequeueMove, queueMove } = useMovesActions();
 
     const shouldExecuteNextMove = !isActiveMove && nextMove;
 

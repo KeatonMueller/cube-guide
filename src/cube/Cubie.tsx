@@ -8,8 +8,7 @@ import { getVector3String } from './utils/stringUtils';
 import { moveToRotationMatrix } from './utils/moveUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
-import { useMovesStore } from '../store/moves/store';
-import { selectCubieMoves } from '../store/moves/selectors';
+import { useCubieMoves, useMovesActions } from '../store/moves/store';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -39,8 +38,8 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
     const turnProgress = useRef<number>(0);
 
-    const cubieMoves = useMovesStore(selectCubieMoves);
-    const { clearCubieMove } = useMovesStore(state => state.actions);
+    const cubieMoves = useCubieMoves();
+    const { clearCubieMove } = useMovesActions();
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
     // the cubieRef's position stores the realtime position of the mesh, while this

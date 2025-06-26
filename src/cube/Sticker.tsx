@@ -12,8 +12,7 @@ import {
 import { moveToRotationMatrix } from './utils/moveUtils';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
-import { useMovesStore } from '../store/moves/store';
-import { selectMovesActions, selectStickerMoves } from '../store/moves/selectors';
+import { useMovesActions, useStickerMoves } from '../store/moves/store';
 import { useFrame, type RootState } from '@react-three/fiber';
 
 export type StickerProps = {
@@ -65,8 +64,8 @@ const Sticker = ({ location, color }: StickerProps) => {
     // this ref tracks the progress of animating a turn
     const turnProgress = useRef<number>(0);
 
-    const stickerMoves = useMovesStore(selectStickerMoves);
-    const { clearStickerMove } = useMovesStore(selectMovesActions);
+    const stickerMoves = useStickerMoves();
+    const { clearStickerMove } = useMovesActions();
 
     // this stores the coordinate location of the mesh, only updated after a move finishes
     const [fixedLocation, setFixedLocation] = useState<StickerLocation>(location);

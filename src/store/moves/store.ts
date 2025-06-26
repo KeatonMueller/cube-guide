@@ -8,6 +8,7 @@ import {
 } from '../../cube/constants';
 import { doesMoveTargetPosition } from '../../cube/utils/moveUtils';
 import { getStickerLocationString, getVector3String } from '../../cube/utils/stringUtils';
+import { selectCubieMoves, selectIsActiveMove, selectNextMove, selectStickerMoves } from './selectors';
 
 export type Actions = {
     queueMove: (move: Move) => void;
@@ -23,14 +24,12 @@ export type MoveMap = Record<string, Move | null>;
 export type MovesState = {
     actions: Actions;
     moveBuffer: Move[];
-    strBuffer: Move[];
     cubieMoves: MoveMap;
     stickerMoves: MoveMap;
 };
 
 const initialState: Omit<MovesState, 'actions'> = {
     moveBuffer: [],
-    strBuffer: [],
     cubieMoves: {},
     stickerMoves: {},
 };
@@ -43,7 +42,7 @@ STICKER_LOCATION_STRINGS.forEach(locationString => {
     initialState.stickerMoves[locationString] = null;
 });
 
-export const useMovesStore = create<MovesState>(set => ({
+const useMovesStore = create<MovesState>(set => ({
     ...initialState,
     actions: {
         queueMove: (move: Move) => set(state => ({ moveBuffer: [...state.moveBuffer, move] })),
@@ -95,3 +94,9 @@ export const useMovesStore = create<MovesState>(set => ({
             })),
     },
 }));
+
+export const useNextMove = () => useMovesStore(selectNextMove);
+export const useIsActiveMove = () => useMovesStore(selectIsActiveMove);
+export const useCubieMoves = () => useMovesStore(selectCubieMoves);
+export const useStickerMoves = () => useMovesStore(selectStickerMoves);
+export const useMovesActions = () => useMovesStore(state => state.actions);
