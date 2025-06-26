@@ -37,6 +37,7 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
 
 const Cubie = ({ position: initPosition }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
+    const turnProgress = useRef<number>(0);
 
     const cubieMoves = useMovesStore(selectCubieMoves);
     const { clearCubieMove } = useMovesStore(state => state.actions);
@@ -61,19 +62,19 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
         nextPosition.applyMatrix3(rotationMatrix);
         cubieRef.current.position.copy(nextPosition);
 
-        const nextTheta = cubieRef.current.rotation[axisLabel] + deltaTheta;
-        cubieRef.current.rotation[axisLabel] = nextTheta;
+        turnProgress.current += deltaTheta;
+        cubieRef.current.rotation[axisLabel] += deltaTheta;
 
-        if (Math.abs(nextTheta) >= Math.abs(targetTheta)) {
+        if (Math.abs(turnProgress.current) >= Math.abs(targetTheta)) {
             // if the animation that just completed was a full quarter turn,
             // round the current position vector and store it
             if (Math.abs(targetTheta) === HALF_PI) {
                 roundVector3(cubieRef.current.position);
                 setPosition(cubieRef.current.position.clone());
+                cubieRef.current.rotation[axisLabel] = 0;
             }
-            // reset theta trackers and flag move as complete
-            cubieRef.current.rotation[axisLabel] = 0;
-
+            // reset turn tracker and flag move as complete
+            turnProgress.current = 0;
             clearCubieMove(posString);
         }
     });
