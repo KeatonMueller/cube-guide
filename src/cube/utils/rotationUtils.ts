@@ -63,9 +63,6 @@ const AxisToRotationMatrix = {
  * Get a rotation matrix for the given axis vector
  * for the given number of radians.
  */
-export const getRotationMatrix = (
-    axisVector: THREE.Vector3,
-    theta: number
-): THREE.Matrix3 => {
+export const getRotationMatrix = (axisVector: THREE.Vector3, theta: number): THREE.Matrix3 => {
     return AxisToRotationMatrix[getVector3String(axisVector)](theta);
 };

@@ -7,10 +7,7 @@ import {
     type Move,
 } from '../../cube/constants';
 import { doesMoveTargetPosition } from '../../cube/utils/moveUtils';
-import {
-    getStickerLocationString,
-    getVector3String,
-} from '../../cube/utils/stringUtils';
+import { getStickerLocationString, getVector3String } from '../../cube/utils/stringUtils';
 
 export type Actions = {
     queueMove: (move: Move) => void;
@@ -49,10 +46,8 @@ STICKER_LOCATION_STRINGS.forEach(locationString => {
 export const useMovesStore = create<MovesState>(set => ({
     ...initialState,
     actions: {
-        queueMove: (move: Move) =>
-            set(state => ({ moveBuffer: [...state.moveBuffer, move] })),
-        dequeueMove: () =>
-            set(state => ({ moveBuffer: state.moveBuffer.slice(1) })),
+        queueMove: (move: Move) => set(state => ({ moveBuffer: [...state.moveBuffer, move] })),
+        dequeueMove: () => set(state => ({ moveBuffer: state.moveBuffer.slice(1) })),
         clearMoves: () => set(() => ({ moveBuffer: [] })),
         executeMove: (move: Move) =>
             set(state => {
@@ -65,15 +60,8 @@ export const useMovesStore = create<MovesState>(set => ({
 
                 const stickerMoves: MoveMap = {};
                 STICKER_LOCATIONS.forEach(stickerLocation => {
-                    if (
-                        doesMoveTargetPosition(
-                            move,
-                            stickerLocation.cubiePosition
-                        )
-                    ) {
-                        stickerMoves[
-                            getStickerLocationString(stickerLocation)
-                        ] = move;
+                    if (doesMoveTargetPosition(move, stickerLocation.cubiePosition)) {
+                        stickerMoves[getStickerLocationString(stickerLocation)] = move;
                     }
                 });
 

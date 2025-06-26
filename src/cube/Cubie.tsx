@@ -2,12 +2,7 @@ import * as THREE from 'three';
 import { useRef, useState } from 'react';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
-import {
-    ANIMATION_SPEED,
-    Color,
-    HALF_PI,
-    STICKER_LOCATIONS,
-} from './constants';
+import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
 import { getVector3String } from './utils/stringUtils';
 import { moveToRotationMatrix } from './utils/moveUtils';
@@ -21,23 +16,23 @@ export type CubieProps = {
 };
 
 const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
-    return STICKER_LOCATIONS.filter(
-        stickerLocation => stickerLocation.cubiePosition === cubiePosition
-    ).map(stickerLocation => {
-        const { facingVector } = stickerLocation;
-        let color;
-        if (facingVector.x !== 0) {
-            color = facingVector.x > 0 ? Color.BLUE : Color.GREEN;
-        } else if (facingVector.y !== 0) {
-            color = facingVector.y > 0 ? Color.WHITE : Color.YELLOW;
-        } else {
-            color = facingVector.z > 0 ? Color.RED : Color.ORANGE;
+    return STICKER_LOCATIONS.filter(stickerLocation => stickerLocation.cubiePosition === cubiePosition).map(
+        stickerLocation => {
+            const { facingVector } = stickerLocation;
+            let color;
+            if (facingVector.x !== 0) {
+                color = facingVector.x > 0 ? Color.BLUE : Color.GREEN;
+            } else if (facingVector.y !== 0) {
+                color = facingVector.y > 0 ? Color.WHITE : Color.YELLOW;
+            } else {
+                color = facingVector.z > 0 ? Color.RED : Color.ORANGE;
+            }
+            return {
+                location: stickerLocation,
+                color,
+            };
         }
-        return {
-            location: stickerLocation,
-            color,
-        };
-    });
+    );
 };
 
 const Cubie = ({ position: initPosition }: CubieProps) => {

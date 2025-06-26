@@ -16,14 +16,7 @@ const eps = 0.00001;
 const radius = radius0 - eps;
 shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
 shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
-shape.absarc(
-    width - radius * 2,
-    height - radius * 2,
-    eps,
-    Math.PI / 2,
-    0,
-    true
-);
+shape.absarc(width - radius * 2, height - radius * 2, eps, Math.PI / 2, 0, true);
 shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
 
 // create the geometry based on the shape

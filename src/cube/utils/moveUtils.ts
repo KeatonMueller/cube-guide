@@ -6,10 +6,7 @@ import { getRotationMatrix } from './rotationUtils';
  * For the given move and angle theta, return the corresponding rotation matrix
  * needed to apply to a Vector3 position to execute the move.
  */
-export const moveToRotationMatrix = (
-    move: Move,
-    theta: number
-): THREE.Matrix3 => {
+export const moveToRotationMatrix = (move: Move, theta: number): THREE.Matrix3 => {
     const rotationAxis = AXIS_LABEL_TO_VECTOR[move.axisLabel];
 
     return getRotationMatrix(rotationAxis, theta);
@@ -18,9 +15,6 @@ export const moveToRotationMatrix = (
 /**
  * Check if the given move targets the given position.
  */
-export const doesMoveTargetPosition = (
-    move: Move,
-    position: THREE.Vector3
-): boolean => {
+export const doesMoveTargetPosition = (move: Move, position: THREE.Vector3): boolean => {
     return move.axisValues.includes(position[move.axisLabel] as TAxisValue);
 };

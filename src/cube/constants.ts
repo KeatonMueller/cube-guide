@@ -1,8 +1,5 @@
 import * as THREE from 'three';
-import {
-    getStickerLocationString,
-    getVector3String,
-} from './utils/stringUtils';
+import { getStickerLocationString, getVector3String } from './utils/stringUtils';
 
 export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
@@ -37,10 +34,7 @@ export const AxisLabel = {
     Y: 'y',
     Z: 'z',
 } as const;
-export type TAxisLabel =
-    | typeof AxisLabel.X
-    | typeof AxisLabel.Y
-    | typeof AxisLabel.Z;
+export type TAxisLabel = typeof AxisLabel.X | typeof AxisLabel.Y | typeof AxisLabel.Z;
 
 /**
  * Axis values used in a 3x3 coordinate space centered at 0.
@@ -50,10 +44,7 @@ export const AxisValue = {
     ZERO: 0,
     POSITIVE: 1,
 } as const;
-export type TAxisValue =
-    | typeof AxisValue.NEGATIVE
-    | typeof AxisValue.ZERO
-    | typeof AxisValue.POSITIVE;
+export type TAxisValue = typeof AxisValue.NEGATIVE | typeof AxisValue.ZERO | typeof AxisValue.POSITIVE;
 
 export const AXIS_LABEL_TO_VECTOR = {
     [AxisLabel.X]: AxisVector[POSITIVE].X,
@@ -69,8 +60,7 @@ export const CUBIE_POSITIONS: THREE.Vector3[] = [];
 for (let x = -1; x <= 1; x++) {
     for (let y = -1; y <= 1; y++) {
         for (let z = -1; z <= 1; z++) {
-            if (x !== 0 || y !== 0 || z !== 0)
-                CUBIE_POSITIONS.push(new THREE.Vector3(x, y, z));
+            if (x !== 0 || y !== 0 || z !== 0) CUBIE_POSITIONS.push(new THREE.Vector3(x, y, z));
         }
     }
 }
@@ -78,9 +68,7 @@ for (let x = -1; x <= 1; x++) {
 /**
  * String representations of the CUBIE_POSITIONS array.
  */
-export const CUBIE_POSITION_STRINGS: string[] = CUBIE_POSITIONS.map(position =>
-    getVector3String(position)
-);
+export const CUBIE_POSITION_STRINGS: string[] = CUBIE_POSITIONS.map(position => getVector3String(position));
 
 /**
  * Type representing an individual sticker location.
@@ -127,8 +115,8 @@ CUBIE_POSITIONS.forEach(cubiePosition => {
 /**
  * String representations of the STICKER_LOCATIONS array.
  */
-export const STICKER_LOCATION_STRINGS: string[] = STICKER_LOCATIONS.map(
-    stickerLocation => getStickerLocationString(stickerLocation)
+export const STICKER_LOCATION_STRINGS: string[] = STICKER_LOCATIONS.map(stickerLocation =>
+    getStickerLocationString(stickerLocation)
 );
 
 export const Color = {

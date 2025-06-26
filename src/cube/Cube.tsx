@@ -3,17 +3,12 @@ import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
 import { useEffect } from 'react';
 import { useMovesStore } from '../store/moves/store';
-import {
-    selectMovesActions,
-    selectIsActiveMove,
-    selectNextMove,
-} from '../store/moves/selectors';
+import { selectMovesActions, selectIsActiveMove, selectNextMove } from '../store/moves/selectors';
 
 const Cube = () => {
     const nextMove = useMovesStore(selectNextMove);
     const isActiveMove = useMovesStore(selectIsActiveMove);
-    const { executeMove, dequeueMove, queueMove } =
-        useMovesStore(selectMovesActions);
+    const { executeMove, dequeueMove, queueMove } = useMovesStore(selectMovesActions);
 
     const shouldExecuteNextMove = !isActiveMove && nextMove;
 

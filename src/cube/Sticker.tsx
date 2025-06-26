@@ -13,10 +13,7 @@ import { moveToRotationMatrix } from './utils/moveUtils';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesStore } from '../store/moves/store';
-import {
-    selectMovesActions,
-    selectStickerMoves,
-} from '../store/moves/selectors';
+import { selectMovesActions, selectStickerMoves } from '../store/moves/selectors';
 import { useFrame, type RootState } from '@react-three/fiber';
 
 export type StickerProps = {
@@ -48,66 +45,36 @@ const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
  * needed to face the sticker that way (or 180 degrees the other way, since it's the same).
  */
 const getStickerRotation = (facingVector: THREE.Vector3): THREE.Euler => {
-    return new THREE.Euler(
-        HALF_PI * facingVector.y,
-        HALF_PI * facingVector.x,
-        0,
-        THREE.Euler.DEFAULT_ORDER
-    );
+    return new THREE.Euler(HALF_PI * facingVector.y, HALF_PI * facingVector.x, 0, THREE.Euler.DEFAULT_ORDER);
 };
 
 const Sticker = ({ location, color }: StickerProps) => {
     // initial position and rotation based on props
-    // all future values are stored in local state and the stickerRef
+    // all future values are stored in local state and refs
     const initPosition = getStickerPosition(location);
     const initRotation = getStickerRotation(location.facingVector);
 
+    // by definition, this stickerRef stores the real time position and rotation of the sticker
     const stickerRef = useRef<THREE.Mesh>(null!);
-    const rotation = useRef<number>(0);
+    // this ref stores the real time StickerLocation of the sticker, which gets translated
+    // to position and rotation and applied to the stickerRef
     const realTimeLocation = useRef<StickerLocation>({
         cubiePosition: location.cubiePosition,
         facingVector: location.facingVector,
     });
+    // this ref tracks the progress of animating a turn
+    const turnProgress = useRef<number>(0);
 
     const stickerMoves = useMovesStore(selectStickerMoves);
     const { clearStickerMove } = useMovesStore(selectMovesActions);
 
-    // the stickerRef's position stores the realtime position of the mesh, while this
-    // stores the coordinate location of the mesh, only updated after a move finishes
-    const [stickerLocation, setStickerLocation] =
-        useState<StickerLocation>(location);
+    // this stores the coordinate location of the mesh, only updated after a move finishes
+    const [fixedLocation, setFixedLocation] = useState<StickerLocation>(location);
 
-    const locationString = getStickerLocationString(stickerLocation);
+    const locationString = getStickerLocationString(fixedLocation);
     const move = stickerMoves[locationString];
 
-    const performTurn = useMemo(
-        () => () => {
-            if (!move) return;
-            const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
-
-            const nextPosition = stickerLocation.cubiePosition.clone();
-            applyMatrix3AndRound(nextPosition, rotationMatrix);
-
-            const nextFacingVector = stickerLocation.facingVector.clone();
-            applyMatrix3AndRound(nextFacingVector, rotationMatrix);
-
-            const nextLocation: StickerLocation = {
-                cubiePosition: nextPosition,
-                facingVector: nextFacingVector,
-            };
-
-            const nextStickerPosition = getStickerPosition(nextLocation);
-            const nextStickerRotation = getStickerRotation(nextFacingVector);
-            stickerRef.current.position.copy(nextStickerPosition);
-            stickerRef.current.rotation.copy(nextStickerRotation);
-
-            realTimeLocation.current = nextLocation;
-            setStickerLocation(nextLocation);
-            clearStickerMove(locationString);
-        },
-        [move, stickerLocation, stickerRef.current]
-    );
-
+    // every frame, animate the ongoing turn if there is one
     useFrame((_: RootState, delta: number) => {
         if (!move) return;
         const { axisLabel, targetTheta } = move;
@@ -129,29 +96,50 @@ const Sticker = ({ location, color }: StickerProps) => {
 
         const nextStickerPosition = getStickerPosition(nextLocation);
         stickerRef.current.position.copy(nextStickerPosition);
-        stickerRef.current.rotateOnWorldAxis(
-            AXIS_LABEL_TO_VECTOR[axisLabel],
-            deltaTheta
-        );
+        stickerRef.current.rotateOnWorldAxis(AXIS_LABEL_TO_VECTOR[axisLabel], deltaTheta);
         realTimeLocation.current = nextLocation;
 
-        const nextTheta = rotation.current + deltaTheta;
-        rotation.current = nextTheta;
-        // const nextFacingVector = stickerLocation.facingVector.clone();
-        // applyMatrix3AndRound(nextFacingVector, rotationMatrix);
+        turnProgress.current += deltaTheta;
 
-        if (Math.abs(nextTheta) >= Math.abs(targetTheta)) {
+        if (Math.abs(turnProgress.current) >= Math.abs(targetTheta)) {
             // if the animation that just completed was a full quarter turn,
             // round the current position vector and store it
             if (Math.abs(targetTheta) === HALF_PI) {
                 performTurn();
             }
             // reset theta trackers and flag move as complete
-            rotation.current = 0;
-
+            turnProgress.current = 0;
             clearStickerMove(locationString);
         }
     });
+
+    // perform an instantaneous 90 degree turn
+    const performTurn = useMemo(
+        () => () => {
+            if (!move) return;
+            const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
+
+            const nextPosition = fixedLocation.cubiePosition.clone();
+            applyMatrix3AndRound(nextPosition, rotationMatrix);
+
+            const nextFacingVector = fixedLocation.facingVector.clone();
+            applyMatrix3AndRound(nextFacingVector, rotationMatrix);
+
+            const nextLocation: StickerLocation = {
+                cubiePosition: nextPosition,
+                facingVector: nextFacingVector,
+            };
+
+            const nextStickerPosition = getStickerPosition(nextLocation);
+            const nextStickerRotation = getStickerRotation(nextFacingVector);
+            stickerRef.current.position.copy(nextStickerPosition);
+            stickerRef.current.rotation.copy(nextStickerRotation);
+
+            realTimeLocation.current = nextLocation;
+            setFixedLocation(nextLocation);
+        },
+        [move, fixedLocation, stickerRef.current]
+    );
 
     return (
         <mesh
