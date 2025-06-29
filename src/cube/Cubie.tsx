@@ -5,11 +5,11 @@ import type { StickerProps } from './Sticker';
 import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
 import { getVector3String } from './utils/stringUtils';
-import { moveToRotationMatrix } from './utils/moveUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useMovesActions } from '../store/moves/store';
 import { useIsVisible } from '../store/visibility/store';
+import { getRotationMatrix } from './utils/rotationUtils';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -57,7 +57,7 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
 
         const sign = targetTheta / Math.abs(targetTheta);
         const deltaTheta = sign * delta * ANIMATION_SPEED;
-        const rotationMatrix = moveToRotationMatrix(move, deltaTheta);
+        const rotationMatrix = getRotationMatrix(move.axisLabel, deltaTheta);
 
         const nextPosition = cubieRef.current.position.clone();
         nextPosition.applyMatrix3(rotationMatrix);

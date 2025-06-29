@@ -7,25 +7,6 @@ export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
 export const EPSILON = 0.001;
 export const ANIMATION_SPEED = 7;
 
-export const POSITIVE = 'POSITIVE';
-export const NEGATIVE = 'NEGATIVE';
-
-/**
- * Axis vector enum
- */
-export const AxisVector = {
-    [POSITIVE]: {
-        X: new THREE.Vector3(1, 0, 0),
-        Y: new THREE.Vector3(0, 1, 0),
-        Z: new THREE.Vector3(0, 0, 1),
-    },
-    [NEGATIVE]: {
-        X: new THREE.Vector3(-1, 0, 0),
-        Y: new THREE.Vector3(0, -1, 0),
-        Z: new THREE.Vector3(0, 0, -1),
-    },
-} as const;
-
 /**
  * Labels for each axis. Values match the property names of THREE.Vector3s.
  */
@@ -36,13 +17,16 @@ export const AxisLabel = {
 } as const;
 export type TAxisLabel = typeof AxisLabel.X | typeof AxisLabel.Y | typeof AxisLabel.Z;
 
-export type AxisValue = -1 | 0 | 1;
+/**
+ * Axis vectors
+ */
+export const AxisVector: Record<TAxisLabel, THREE.Vector3> = {
+    [AxisLabel.X]: new THREE.Vector3(1, 0, 0),
+    [AxisLabel.Y]: new THREE.Vector3(0, 1, 0),
+    [AxisLabel.Z]: new THREE.Vector3(0, 0, 1),
+} as const;
 
-export const AXIS_LABEL_TO_VECTOR = {
-    [AxisLabel.X]: AxisVector[POSITIVE].X,
-    [AxisLabel.Y]: AxisVector[POSITIVE].Y,
-    [AxisLabel.Z]: AxisVector[POSITIVE].Z,
-};
+export type AxisValue = -1 | 0 | 1;
 
 /**
  * Positions of all the cubies in 3D space represented as Vector3s.
@@ -80,26 +64,23 @@ export const STICKER_LOCATIONS: StickerLocation[] = [];
 CUBIE_POSITIONS.forEach(cubiePosition => {
     const { x, y, z } = cubiePosition;
     if (x !== 0) {
-        const axisDirection = x > 0 ? POSITIVE : NEGATIVE;
         STICKER_LOCATIONS.push({
             cubiePosition,
-            facingVector: AxisVector[axisDirection].X,
+            facingVector: AxisVector.x.clone().multiplyScalar(x),
         });
     }
 
     if (y !== 0) {
-        const axisDirection = y > 0 ? POSITIVE : NEGATIVE;
         STICKER_LOCATIONS.push({
             cubiePosition,
-            facingVector: AxisVector[axisDirection].Y,
+            facingVector: AxisVector.y.clone().multiplyScalar(y),
         });
     }
 
     if (z !== 0) {
-        const axisDirection = z > 0 ? POSITIVE : NEGATIVE;
         STICKER_LOCATIONS.push({
             cubiePosition,
-            facingVector: AxisVector[axisDirection].Z,
+            facingVector: AxisVector.z.clone().multiplyScalar(z),
         });
     }
 });

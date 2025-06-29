@@ -1,20 +1,13 @@
 import * as THREE from 'three';
 import { useCallback, useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
-import {
-    ANIMATION_SPEED,
-    AXIS_LABEL_TO_VECTOR,
-    EPSILON,
-    HALF_CUBIE_LENGTH,
-    HALF_PI,
-    type StickerLocation,
-} from './constants';
-import { moveToRotationMatrix } from './utils/moveUtils';
+import { ANIMATION_SPEED, AxisVector, EPSILON, HALF_CUBIE_LENGTH, HALF_PI, type StickerLocation } from './constants';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesActions, useStickerMoves } from '../store/moves/store';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useIsVisible } from '../store/visibility/store';
+import { getRotationMatrix } from './utils/rotationUtils';
 
 export type StickerProps = {
     location: StickerLocation;
@@ -81,7 +74,7 @@ const Sticker = ({ location, color }: StickerProps) => {
 
         const sign = targetTheta / Math.abs(targetTheta);
         const deltaTheta = sign * delta * ANIMATION_SPEED;
-        const rotationMatrix = moveToRotationMatrix(move, deltaTheta);
+        const rotationMatrix = getRotationMatrix(move.axisLabel, deltaTheta);
 
         const nextPosition = realTimeLocation.current.cubiePosition.clone();
         nextPosition.applyMatrix3(rotationMatrix);
@@ -96,7 +89,7 @@ const Sticker = ({ location, color }: StickerProps) => {
 
         const nextStickerPosition = getStickerPosition(nextLocation);
         stickerRef.current.position.copy(nextStickerPosition);
-        stickerRef.current.rotateOnWorldAxis(AXIS_LABEL_TO_VECTOR[axisLabel], deltaTheta);
+        stickerRef.current.rotateOnWorldAxis(AxisVector[axisLabel], deltaTheta);
         realTimeLocation.current = nextLocation;
 
         turnProgress.current += deltaTheta;
@@ -116,7 +109,7 @@ const Sticker = ({ location, color }: StickerProps) => {
     // perform an instantaneous 90 degree turn
     const performTurn = useCallback(() => {
         if (!move) return;
-        const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
+        const rotationMatrix = getRotationMatrix(move.axisLabel, move.targetTheta);
 
         const nextPosition = fixedLocation.current.cubiePosition.clone();
         applyMatrix3AndRound(nextPosition, rotationMatrix);
