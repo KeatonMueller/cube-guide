@@ -243,4 +243,34 @@ export const MoveMap: Record<string, Move> = {
         axisValues: [AxisValue.ZERO],
         targetTheta: HALF_PI,
     },
+    x: {
+        axisLabel: AxisLabel.X,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: -HALF_PI,
+    },
+    X: {
+        axisLabel: AxisLabel.X,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: HALF_PI,
+    },
+    y: {
+        axisLabel: AxisLabel.Y,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: -HALF_PI,
+    },
+    Y: {
+        axisLabel: AxisLabel.Y,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: HALF_PI,
+    },
+    z: {
+        axisLabel: AxisLabel.Z,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: -HALF_PI,
+    },
+    Z: {
+        axisLabel: AxisLabel.Z,
+        axisValues: [AxisValue.NEGATIVE, AxisValue.ZERO, AxisValue.POSITIVE],
+        targetTheta: HALF_PI,
+    },
 };
