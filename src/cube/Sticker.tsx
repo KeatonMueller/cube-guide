@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
 import {
     ANIMATION_SPEED,
@@ -113,32 +113,29 @@ const Sticker = ({ location, color }: StickerProps) => {
     });
 
     // perform an instantaneous 90 degree turn
-    const performTurn = useMemo(
-        () => () => {
-            if (!move) return;
-            const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
+    const performTurn = useCallback(() => {
+        if (!move) return;
+        const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
 
-            const nextPosition = fixedLocation.cubiePosition.clone();
-            applyMatrix3AndRound(nextPosition, rotationMatrix);
+        const nextPosition = fixedLocation.cubiePosition.clone();
+        applyMatrix3AndRound(nextPosition, rotationMatrix);
 
-            const nextFacingVector = fixedLocation.facingVector.clone();
-            applyMatrix3AndRound(nextFacingVector, rotationMatrix);
+        const nextFacingVector = fixedLocation.facingVector.clone();
+        applyMatrix3AndRound(nextFacingVector, rotationMatrix);
 
-            const nextLocation: StickerLocation = {
-                cubiePosition: nextPosition,
-                facingVector: nextFacingVector,
-            };
+        const nextLocation: StickerLocation = {
+            cubiePosition: nextPosition,
+            facingVector: nextFacingVector,
+        };
 
-            const nextStickerPosition = getStickerPosition(nextLocation);
-            const nextStickerRotation = getStickerRotation(nextFacingVector);
-            stickerRef.current.position.copy(nextStickerPosition);
-            stickerRef.current.rotation.copy(nextStickerRotation);
+        const nextStickerPosition = getStickerPosition(nextLocation);
+        const nextStickerRotation = getStickerRotation(nextFacingVector);
+        stickerRef.current.position.copy(nextStickerPosition);
+        stickerRef.current.rotation.copy(nextStickerRotation);
 
-            realTimeLocation.current = nextLocation;
-            setFixedLocation(nextLocation);
-        },
-        [move, fixedLocation, stickerRef.current]
-    );
+        realTimeLocation.current = nextLocation;
+        setFixedLocation(nextLocation);
+    }, [move, fixedLocation, stickerRef.current]);
 
     return (
         <mesh
