@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { roundedBoxGeometry } from './cube/geometries/roundedBoxGeometry';
 import Cube from './cube/Cube';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { useIsVisible, useVisibilityActions } from './store/visibility/store';
 
 const Box = () => {
     const boxRef = useRef<THREE.Mesh>(null!);
@@ -27,8 +28,11 @@ const Controls = () => {
         camera,
         gl: { domElement },
     } = useThree();
+    const isVisible = useIsVisible();
+    const { setIsVisible } = useVisibilityActions();
 
     useFrame(() => {
+        if (!isVisible) return;
         controlsRef.current.update();
     });
 
@@ -37,6 +41,13 @@ const Controls = () => {
         camera.position.y = 3;
         camera.position.z = 6;
 
+        // listen for visibility updates
+        const onVisibilityChange = () => {
+            setIsVisible(document.visibilityState === 'visible');
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
+        // pointer events
         const onPointerDown = (e: MouseEvent) => {
             console.log('pointer down!', e);
         };
@@ -49,6 +60,7 @@ const Controls = () => {
         return () => {
             document.removeEventListener('pointerdown', onPointerDown);
             document.removeEventListener('pointerup', onPointerUp);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
         };
     }, []);
 

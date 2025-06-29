@@ -9,6 +9,7 @@ import { moveToRotationMatrix } from './utils/moveUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useMovesActions } from '../store/moves/store';
+import { useIsVisible } from '../store/visibility/store';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -37,20 +38,21 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
 const Cubie = ({ position: initPosition }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
     const turnProgress = useRef<number>(0);
+    // the cubieRef's position stores the real time position of the mesh, while this
+    // stores the coordinate location of the mesh, only updated after a move finishes
+    const fixedPosition = useRef<THREE.Vector3>(initPosition);
 
+    const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
     const { clearCubieMove } = useMovesActions();
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
-    // the cubieRef's position stores the realtime position of the mesh, while this
-    // stores the coordinate location of the mesh, only updated after a move finishes
-    const [position, setPosition] = useState<THREE.Vector3>(initPosition);
 
-    const posString = getVector3String(position);
+    const posString = getVector3String(fixedPosition.current);
     const move = cubieMoves[posString];
 
     useFrame((_: RootState, delta: number) => {
-        if (!move) return;
+        if (!move || !isVisible) return;
         const { axisLabel, targetTheta } = move;
 
         const sign = targetTheta / Math.abs(targetTheta);
@@ -69,7 +71,7 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
             // round the current position vector and store it
             if (Math.abs(targetTheta) === HALF_PI) {
                 roundVector3(cubieRef.current.position);
-                setPosition(cubieRef.current.position.clone());
+                fixedPosition.current = cubieRef.current.position.clone();
                 cubieRef.current.rotation[axisLabel] = 0;
             }
             // reset turn tracker and flag move as complete

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
 import {
     ANIMATION_SPEED,
@@ -14,6 +14,7 @@ import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesActions, useStickerMoves } from '../store/moves/store';
 import { useFrame, type RootState } from '@react-three/fiber';
+import { useIsVisible } from '../store/visibility/store';
 
 export type StickerProps = {
     location: StickerLocation;
@@ -61,21 +62,21 @@ const Sticker = ({ location, color }: StickerProps) => {
         cubiePosition: location.cubiePosition,
         facingVector: location.facingVector,
     });
+    // this stores the coordinate location of the mesh, only updated after a move finishes
+    const fixedLocation = useRef<StickerLocation>(location);
     // this ref tracks the progress of animating a turn
     const turnProgress = useRef<number>(0);
 
+    const isVisible = useIsVisible();
     const stickerMoves = useStickerMoves();
     const { clearStickerMove } = useMovesActions();
 
-    // this stores the coordinate location of the mesh, only updated after a move finishes
-    const [fixedLocation, setFixedLocation] = useState<StickerLocation>(location);
-
-    const locationString = getStickerLocationString(fixedLocation);
+    const locationString = getStickerLocationString(fixedLocation.current);
     const move = stickerMoves[locationString];
 
     // every frame, animate the ongoing turn if there is one
     useFrame((_: RootState, delta: number) => {
-        if (!move) return;
+        if (!move || !isVisible) return;
         const { axisLabel, targetTheta } = move;
 
         const sign = targetTheta / Math.abs(targetTheta);
@@ -117,10 +118,10 @@ const Sticker = ({ location, color }: StickerProps) => {
         if (!move) return;
         const rotationMatrix = moveToRotationMatrix(move, move.targetTheta);
 
-        const nextPosition = fixedLocation.cubiePosition.clone();
+        const nextPosition = fixedLocation.current.cubiePosition.clone();
         applyMatrix3AndRound(nextPosition, rotationMatrix);
 
-        const nextFacingVector = fixedLocation.facingVector.clone();
+        const nextFacingVector = fixedLocation.current.facingVector.clone();
         applyMatrix3AndRound(nextFacingVector, rotationMatrix);
 
         const nextLocation: StickerLocation = {
@@ -134,7 +135,7 @@ const Sticker = ({ location, color }: StickerProps) => {
         stickerRef.current.rotation.copy(nextStickerRotation);
 
         realTimeLocation.current = nextLocation;
-        setFixedLocation(nextLocation);
+        fixedLocation.current = nextLocation;
     }, [move, fixedLocation, stickerRef.current]);
 
     return (
