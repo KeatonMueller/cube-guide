@@ -32,7 +32,7 @@ const Cube = () => {
     }, []);
 
     return (
-        <group>
+        <group onPointerDown={() => console.log('touch cube')} onPointerUp={() => console.log('release cube')}>
             {CUBIE_POSITIONS.map(position => (
                 <Cubie position={position} key={getVector3String(position)} />
             ))}
