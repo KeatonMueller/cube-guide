@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AxisLabel, type TAxisLabel } from '../constants';
+import { type AxisLabel } from '../constants';
 
 /**
  * Rotation matrices to rotate the THREE.Vector3 about an axis by
@@ -52,16 +52,16 @@ const getZRotationMatrix = (theta: number): THREE.Matrix3 => {
  * Map the axis to the function for getting its rotation matrix.
  * Key of the map cannot be a THREE.Vector3 so calling toString().
  */
-const AxisToRotationMatrix: Record<TAxisLabel, Function> = {
-    [AxisLabel.X]: getXRotationMatrix,
-    [AxisLabel.Y]: getYRotationMatrix,
-    [AxisLabel.Z]: getZRotationMatrix,
+const AxisToRotationMatrix: Record<AxisLabel, Function> = {
+    x: getXRotationMatrix,
+    y: getYRotationMatrix,
+    z: getZRotationMatrix,
 } as const;
 
 /**
  * Get a rotation matrix for the given axis vector
  * for the given number of radians.
  */
-export const getRotationMatrix = (axisLabel: TAxisLabel, theta: number): THREE.Matrix3 => {
+export const getRotationMatrix = (axisLabel: AxisLabel, theta: number): THREE.Matrix3 => {
     return AxisToRotationMatrix[axisLabel](theta);
 };

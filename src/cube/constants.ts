@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { getStickerLocationString, getVector3String } from './utils/stringUtils';
 
+// half pi is a quarter turn in radians, which is something we'll
+// be doing a lot of so store a convenience constant
+export const HALF_PI = Math.PI * 0.5;
 export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
 export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
@@ -10,20 +13,15 @@ export const ANIMATION_SPEED = 7;
 /**
  * Labels for each axis. Values match the property names of THREE.Vector3s.
  */
-export const AxisLabel = {
-    X: 'x',
-    Y: 'y',
-    Z: 'z',
-} as const;
-export type TAxisLabel = typeof AxisLabel.X | typeof AxisLabel.Y | typeof AxisLabel.Z;
+export type AxisLabel = 'x' | 'y' | 'z';
 
 /**
  * Axis vectors
  */
-export const AxisVector: Record<TAxisLabel, THREE.Vector3> = {
-    [AxisLabel.X]: new THREE.Vector3(1, 0, 0),
-    [AxisLabel.Y]: new THREE.Vector3(0, 1, 0),
-    [AxisLabel.Z]: new THREE.Vector3(0, 0, 1),
+export const AxisVector: Record<AxisLabel, THREE.Vector3> = {
+    x: new THREE.Vector3(1, 0, 0),
+    y: new THREE.Vector3(0, 1, 0),
+    z: new THREE.Vector3(0, 0, 1),
 } as const;
 
 export type AxisValue = -1 | 0 | 1;
@@ -101,148 +99,131 @@ export const Color = {
     GREEN: 0x00ff00,
 } as const;
 
-// half pi is a quarter turn in radians, which is something we'll
-// be doing a lot of so store a convenience constant
-export const HALF_PI = Math.PI * 0.5;
-
-export const Layer = {
-    F: 'F',
-    B: 'B',
-    U: 'U',
-    D: 'D',
-    R: 'R',
-    L: 'L',
-    M: 'M',
-    E: 'E',
-    S: 'S',
-} as const;
-export type TLayer = 'F' | 'B' | 'U' | 'D' | 'R' | 'L' | 'M' | 'E' | 'S';
-
 // A move consists of a rotation axis, an axis identifier (-1, 0, 1), and a target theta
 export type Move = {
-    axisLabel: TAxisLabel;
+    axisLabel: AxisLabel;
     axisValues: AxisValue[];
     targetTheta: number;
 };
 
 export const MoveMap: Record<string, Move> = {
     f: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [1],
         targetTheta: -HALF_PI,
     },
     F: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [1],
         targetTheta: HALF_PI,
     },
     b: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [-1],
         targetTheta: HALF_PI,
     },
     B: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [-1],
         targetTheta: -HALF_PI,
     },
     u: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [1],
         targetTheta: -HALF_PI,
     },
     U: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [1],
         targetTheta: HALF_PI,
     },
     d: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [-1],
         targetTheta: HALF_PI,
     },
     D: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [-1],
         targetTheta: -HALF_PI,
     },
     r: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [1],
         targetTheta: -HALF_PI,
     },
     R: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [1],
         targetTheta: HALF_PI,
     },
     l: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [-1],
         targetTheta: HALF_PI,
     },
     L: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [-1],
         targetTheta: -HALF_PI,
     },
     m: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [0],
         targetTheta: HALF_PI,
     },
     M: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [0],
         targetTheta: -HALF_PI,
     },
     e: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [0],
         targetTheta: HALF_PI,
     },
     E: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [0],
         targetTheta: -HALF_PI,
     },
     s: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [0],
         targetTheta: -HALF_PI,
     },
     S: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [0],
         targetTheta: HALF_PI,
     },
     x: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [-1, 0, 1],
         targetTheta: -HALF_PI,
     },
     X: {
-        axisLabel: AxisLabel.X,
+        axisLabel: 'x',
         axisValues: [-1, 0, 1],
         targetTheta: HALF_PI,
     },
     y: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [-1, 0, 1],
         targetTheta: -HALF_PI,
     },
     Y: {
-        axisLabel: AxisLabel.Y,
+        axisLabel: 'y',
         axisValues: [-1, 0, 1],
         targetTheta: HALF_PI,
     },
     z: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [-1, 0, 1],
         targetTheta: -HALF_PI,
     },
     Z: {
-        axisLabel: AxisLabel.Z,
+        axisLabel: 'z',
         axisValues: [-1, 0, 1],
         targetTheta: HALF_PI,
     },
