@@ -6,6 +6,7 @@ import { roundedBoxGeometry } from './cube/geometries/roundedBoxGeometry';
 import Cube from './cube/Cube';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useIsVisible, useVisibilityActions } from './store/visibility/store';
+import { findCameraAxes } from './cube/utils/facingUtils';
 
 const Box = () => {
     const boxRef = useRef<THREE.Mesh>(null!);
@@ -34,6 +35,7 @@ const Controls = () => {
     useFrame(() => {
         if (!isVisible) return;
         controlsRef.current.update();
+        // console.log(camera.rotation);
     });
 
     useEffect(() => {
@@ -49,10 +51,11 @@ const Controls = () => {
 
         // pointer events
         const onPointerDown = (e: MouseEvent) => {
-            console.log('pointer down!', e);
+            // console.log('pointer down!', e);
         };
         const onPointerUp = (e: MouseEvent) => {
-            console.log('pointer up!', e);
+            // console.log('pointer up!', e);
+            console.log(JSON.stringify(findCameraAxes(camera)));
         };
         document.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('pointerup', onPointerUp);

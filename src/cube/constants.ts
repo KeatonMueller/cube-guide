@@ -14,6 +14,7 @@ export const ANIMATION_SPEED = 7;
  * Labels for each axis. Values match the property names of THREE.Vector3s.
  */
 export type AxisLabel = 'x' | 'y' | 'z';
+export const AxisLabels: AxisLabel[] = ['x', 'y', 'z'];
 
 /**
  * Axis vectors
@@ -25,6 +26,13 @@ export const AxisVector: Record<AxisLabel, THREE.Vector3> = {
 } as const;
 
 export type AxisValue = -1 | 0 | 1;
+export type AxisDirection = -1 | 1;
+export const AxisDirections: AxisDirection[] = [-1, 1];
+
+export type DirectedAxis = {
+    axisLabel: AxisLabel;
+    direction: AxisDirection;
+};
 
 /**
  * Positions of all the cubies in 3D space represented as Vector3s.
