@@ -16,6 +16,9 @@ const directedAxisAndDirectionToSign = (directedAxis: DirectedAxis, direction: D
     return (sign * directedAxis.direction) as Sign;
 };
 
+const OUTER_LAYER_MOVES = ['u', 'd', 'f', 'b', 'r', 'l'];
+const SLICE_MOVES = ['m', 'e', 's'];
+const ROTATION_MOVES = ['x', 'y', 'z'];
 /**
  * Based on the given keypress and camera object, return the move (if any) that
  * the key corresponds to.
@@ -27,14 +30,22 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
     switch (key) {
         case 'u':
         case 'U':
+        case 'y':
+        case 'Y':
             directedAxis = cameraAxes.up;
             break;
         case 'd':
         case 'D':
+        case 'e':
+        case 'E':
             directedAxis = cameraAxes.down;
             break;
         case 'f':
         case 'F':
+        case 's':
+        case 'S':
+        case 'z':
+        case 'Z':
             directedAxis = cameraAxes.front;
             break;
         case 'b':
@@ -43,10 +54,14 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
             break;
         case 'r':
         case 'R':
+        case 'x':
+        case 'X':
             directedAxis = cameraAxes.right;
             break;
         case 'l':
         case 'L':
+        case 'm':
+        case 'M':
             directedAxis = cameraAxes.left;
             break;
         default:
@@ -56,9 +71,18 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
     const direction: Direction = key === key.toUpperCase() ? 'counterclockwise' : 'clockwise';
     const sign = directedAxisAndDirectionToSign(directedAxis, direction);
 
+    const axisValues: AxisValue[] = [];
+    if (OUTER_LAYER_MOVES.includes(key.toLowerCase())) {
+        axisValues.push(directedAxis.direction);
+    } else if (SLICE_MOVES.includes(key.toLowerCase())) {
+        axisValues.push(0);
+    } else if (ROTATION_MOVES.includes(key.toLowerCase())) {
+        axisValues.push(-1, 0, 1);
+    }
+
     return {
         axisLabel: directedAxis.axisLabel,
-        axisValues: [directedAxis.direction],
+        axisValues,
         targetTheta: HALF_PI * sign,
     };
 };
