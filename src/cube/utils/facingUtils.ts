@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { AxisDirections, AxisLabels, AxisVector, HALF_PI, type AxisDirection, type DirectedAxis } from '../constants';
-import { directedAxisToVector3 } from './vectorUtils';
+import { Signs, AxisLabels, HALF_PI, type Sign, type DirectedAxis } from '../constants';
+import { directedAxisToVector3, roundVector3, vector3ToDirectedAxis } from './vectorUtils';
 
 /**
  * This map helps find which directed axis is the camera's "up" face **when
@@ -27,7 +27,7 @@ import { directedAxisToVector3 } from './vectorUtils';
  * There is a point where it flips from positive to negative pi, so this map has
  * entries for both of them corresponding to the same directed axis
  */
-const UP_AXIS_ROTATION_MAP: Record<AxisDirection, Record<number, DirectedAxis>> = {
+const UP_AXIS_ROTATION_MAP: Record<Sign, Record<number, DirectedAxis>> = {
     [1]: {
         [Math.PI]: { axisLabel: 'z', direction: 1 },
         [-Math.PI]: { axisLabel: 'z', direction: 1 },
@@ -54,7 +54,7 @@ const findFrontAxis = (camera: THREE.Object3D): DirectedAxis => {
     let closestDistance = Number.MAX_VALUE;
 
     for (const axisLabel of AxisLabels) {
-        for (const direction of AxisDirections) {
+        for (const direction of Signs) {
             const directedAxis = { axisLabel, direction };
             const distance = camera.position.distanceTo(directedAxisToVector3(directedAxis));
             if (distance < closestDistance) {
@@ -99,14 +99,43 @@ const findUpAxis = (camera: THREE.Object3D, frontAxis: DirectedAxis): DirectedAx
 };
 
 export type CameraAxes = {
-    front: DirectedAxis;
     up: DirectedAxis;
+    down: DirectedAxis;
+    right: DirectedAxis;
+    left: DirectedAxis;
+    front: DirectedAxis;
+    back: DirectedAxis;
 };
+
 export const findCameraAxes = (camera: THREE.Object3D): CameraAxes => {
-    const frontAxis = findFrontAxis(camera);
-    const upAxis = findUpAxis(camera, frontAxis);
+    const front = findFrontAxis(camera);
+    const up = findUpAxis(camera, front);
+    const frontVector = directedAxisToVector3(front);
+    const upVector = directedAxisToVector3(up);
+
+    const rightVector = upVector.applyAxisAngle(frontVector, -HALF_PI);
+    roundVector3(rightVector);
+    const right = vector3ToDirectedAxis(rightVector);
+
+    const down: DirectedAxis = {
+        axisLabel: up.axisLabel,
+        direction: (up.direction * -1) as Sign,
+    };
+    const back: DirectedAxis = {
+        axisLabel: front.axisLabel,
+        direction: (front.direction * -1) as Sign,
+    };
+    const left: DirectedAxis = {
+        axisLabel: right.axisLabel,
+        direction: (right.direction * -1) as Sign,
+    };
+
     return {
-        front: frontAxis,
-        up: upAxis,
+        up,
+        down,
+        right,
+        left,
+        front,
+        back,
     };
 };

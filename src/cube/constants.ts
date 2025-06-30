@@ -26,12 +26,12 @@ export const AxisVector: Record<AxisLabel, THREE.Vector3> = {
 } as const;
 
 export type AxisValue = -1 | 0 | 1;
-export type AxisDirection = -1 | 1;
-export const AxisDirections: AxisDirection[] = [-1, 1];
+export type Sign = -1 | 1;
+export const Signs: Sign[] = [-1, 1];
 
 export type DirectedAxis = {
     axisLabel: AxisLabel;
-    direction: AxisDirection;
+    direction: Sign;
 };
 
 /**
@@ -106,6 +106,8 @@ export const Color = {
     BLUE: 0x0000ff,
     GREEN: 0x00ff00,
 } as const;
+
+export type Direction = 'clockwise' | 'counterclockwise';
 
 // A move consists of a rotation axis, an axis identifier (-1, 0, 1), and a target theta
 export type Move = {

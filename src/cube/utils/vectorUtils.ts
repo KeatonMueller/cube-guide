@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AxisVector, type DirectedAxis } from '../constants';
+import { AxisVector, type DirectedAxis, type Sign } from '../constants';
 
 /**
  * Apply the given Matrix3 to the given Vector3 and then round the
@@ -27,4 +27,28 @@ export const roundVector3 = (vector: THREE.Vector3): void => {
  */
 export const directedAxisToVector3 = (directedAxis: DirectedAxis): THREE.Vector3 => {
     return AxisVector[directedAxis.axisLabel].clone().multiplyScalar(directedAxis.direction);
+};
+
+/**
+ * Return a DirectedAxis corresponding to the Vector3.
+ *
+ * Given Vector3 must be a unit vector alone one of the axes.
+ */
+export const vector3ToDirectedAxis = (vector: THREE.Vector3): DirectedAxis => {
+    if (vector.x !== 0) {
+        return {
+            axisLabel: 'x',
+            direction: vector.x as Sign,
+        };
+    } else if (vector.y !== 0) {
+        return {
+            axisLabel: 'y',
+            direction: vector.y as Sign,
+        };
+    } else {
+        return {
+            axisLabel: 'z',
+            direction: vector.z as Sign,
+        };
+    }
 };
