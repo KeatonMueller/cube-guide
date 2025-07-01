@@ -3,8 +3,6 @@ import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
 import { useEffect, type RefObject } from 'react';
 import { useIsActiveMove, useMovesActions, useNextMove } from '../store/moves/store';
-import { keyToMove } from './utils/moveUtils';
-import { useThree } from '@react-three/fiber';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useEventListeners } from './hooks/useEventListeners';
 
@@ -13,10 +11,9 @@ export interface CubeProps {
 }
 
 const Cube = ({ controlsRef }: CubeProps) => {
-    const { camera } = useThree();
     const nextMove = useNextMove();
     const isActiveMove = useIsActiveMove();
-    const { executeMove, dequeueMove, queueMove } = useMovesActions();
+    const { executeMove, dequeueMove } = useMovesActions();
 
     useEventListeners(controlsRef);
 
@@ -28,23 +25,6 @@ const Cube = ({ controlsRef }: CubeProps) => {
             dequeueMove();
         }
     }, [shouldExecuteNextMove, nextMove]);
-
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent): void => {
-            const move = keyToMove(e.key, camera);
-            if (move) {
-                queueMove(move);
-            }
-            // if (MoveMap[e.key]) {
-            //     queueMove(MoveMap[e.key]);
-            // }
-        };
-        document.addEventListener('keydown', onKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, []);
 
     return (
         <group>

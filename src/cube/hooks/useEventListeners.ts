@@ -3,8 +3,14 @@ import { useEffect, type RefObject } from 'react';
 import type { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { usePointerLocation, useTouchActions } from '../../store/touch/store';
 import { useConfigActions } from '../../store/config/store';
+import { keyToMove } from '../utils/moveUtils';
+import { useMovesActions } from '../../store/moves/store';
+import { useThree } from '@react-three/fiber';
 
 export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void => {
+    const { camera } = useThree();
+    const { queueMove } = useMovesActions();
+
     const { setIsVisible } = useConfigActions();
     const pointerLocation = usePointerLocation();
     const { setPointerLocation, setPointerSelection } = useTouchActions();
@@ -18,6 +24,15 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
             setIsVisible(document.visibilityState === 'visible');
         };
         document.addEventListener('visibilitychange', onVisibilityChange, abortController);
+
+        // listen for keyboard events to trigger moves
+        const onKeyDown = (e: KeyboardEvent): void => {
+            const move = keyToMove(e.key, camera);
+            if (move) {
+                queueMove(move);
+            }
+        };
+        document.addEventListener('keydown', onKeyDown, abortController);
 
         return () => {
             abortController.abort();
