@@ -44,16 +44,9 @@ const Cube = ({ controlsRef }: CubeProps) => {
     }, []);
 
     return (
-        <group
-            onPointerDown={e => {
-                e.stopPropagation();
-                const locationString = e.object?.userData?.locationString;
-                console.log('clicked', locationString);
-                controlsRef.current.enabled = false;
-            }}
-        >
+        <group>
             {CUBIE_POSITIONS.map(position => (
-                <Cubie position={position} key={getVector3String(position)} />
+                <Cubie position={position} controlsRef={controlsRef} key={getVector3String(position)} />
             ))}
         </group>
     );

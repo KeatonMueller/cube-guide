@@ -74,7 +74,7 @@ const Controls = ({ controlsRef }: ControlsProps) => {
             ref={controlsRef}
             args={[camera, domElement]}
             enableDamping={true}
-            enableZoom={false}
+            enableZoom={true}
             enablePan={false}
         />
     );

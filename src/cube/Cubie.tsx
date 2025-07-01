@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useRef, useState } from 'react';
+import { useRef, useState, type RefObject } from 'react';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
 import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants';
@@ -10,9 +10,12 @@ import { useFrame, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useMovesActions } from '../store/moves/store';
 import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { getFacingVector } from './utils/touchUtils';
 
 export type CubieProps = {
     position: THREE.Vector3;
+    controlsRef: RefObject<OrbitControls>;
 };
 
 const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
@@ -35,7 +38,7 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
     );
 };
 
-const Cubie = ({ position: initPosition }: CubieProps) => {
+const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
     const turnProgress = useRef<number>(0);
     // the cubieRef's position stores the real time position of the mesh, while this
@@ -55,7 +58,7 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
         if (!move || !isVisible) return;
         const { axisLabel, targetTheta } = move;
 
-        const sign = targetTheta / Math.abs(targetTheta);
+        const sign = Math.sign(targetTheta);
         const deltaTheta = sign * delta * ANIMATION_SPEED;
         const rotationMatrix = getRotationMatrix(move.axisLabel, deltaTheta);
 
@@ -92,6 +95,14 @@ const Cubie = ({ position: initPosition }: CubieProps) => {
                     e.stopPropagation();
                     setHighlighted(prevHighlighted => !prevHighlighted);
                 }}
+                onPointerDown={e => {
+                    e.stopPropagation();
+                    controlsRef.current.enabled = false;
+                    const posString = e.object?.userData?.posString;
+                    const facing = getFacingVector(e);
+                    console.log('clicked', posString, 'facing', facing);
+                }}
+                userData={{ posString }}
             >
                 <meshStandardMaterial color={highlighted ? 'gold' : 'black'} />
             </mesh>

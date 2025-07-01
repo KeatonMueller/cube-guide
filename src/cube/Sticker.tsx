@@ -72,7 +72,7 @@ const Sticker = ({ location, color }: StickerProps) => {
         if (!move || !isVisible) return;
         const { axisLabel, targetTheta } = move;
 
-        const sign = targetTheta / Math.abs(targetTheta);
+        const sign = Math.sign(targetTheta);
         const deltaTheta = sign * delta * ANIMATION_SPEED;
         const rotationMatrix = getRotationMatrix(move.axisLabel, deltaTheta);
 
