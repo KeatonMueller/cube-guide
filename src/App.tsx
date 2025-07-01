@@ -1,26 +1,9 @@
-import * as THREE from 'three';
 import './styles/styles.css';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, type RefObject } from 'react';
-import { roundedBoxGeometry } from './cube/geometries/roundedBoxGeometry';
 import Cube from './cube/Cube';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { useIsVisible, useConfigActions } from './store/config/store';
-
-const Box = () => {
-    const boxRef = useRef<THREE.Mesh>(null!);
-
-    useFrame(() => {
-        boxRef.current.rotation.x += 0.005;
-        boxRef.current.rotation.y += 0.01;
-    });
-
-    return (
-        <mesh geometry={roundedBoxGeometry} ref={boxRef}>
-            <meshStandardMaterial color="orange" />
-        </mesh>
-    );
-};
+import { useIsVisible } from './store/config/store';
 
 interface ControlsProps {
     controlsRef: RefObject<OrbitControls>;
@@ -32,7 +15,6 @@ const Controls = ({ controlsRef }: ControlsProps) => {
         gl: { domElement },
     } = useThree();
     const isVisible = useIsVisible();
-    const { setIsVisible } = useConfigActions();
 
     useFrame(() => {
         if (!isVisible) return;
@@ -44,29 +26,6 @@ const Controls = ({ controlsRef }: ControlsProps) => {
         camera.position.x = 4;
         camera.position.y = 3;
         camera.position.z = 6;
-
-        const abortController = new AbortController();
-
-        // listen for visibility updates
-        const onVisibilityChange = () => {
-            setIsVisible(document.visibilityState === 'visible');
-        };
-        document.addEventListener('visibilitychange', onVisibilityChange, abortController);
-
-        // pointer events
-        const onPointerDown = (e: MouseEvent) => {
-            // console.log('pointer down!', e);
-        };
-        const onPointerUp = (e: MouseEvent) => {
-            // console.log('pointer up!', e);
-            controlsRef.current.enabled = true;
-        };
-        document.addEventListener('pointerdown', onPointerDown, abortController);
-        document.addEventListener('pointerup', onPointerUp, abortController);
-
-        return () => {
-            abortController.abort();
-        };
     }, []);
 
     return (
@@ -90,7 +49,6 @@ const ThreeScene = () => {
             {/* <directionalLight color="red" position={[0, 0, 5]} /> */}
             {/* <axesHelper args={[10]} /> */}
             <Controls controlsRef={controlsRef} />
-            {/* <Box /> */}
             <Cube controlsRef={controlsRef} />
         </Canvas>
     );

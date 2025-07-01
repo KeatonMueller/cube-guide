@@ -4,7 +4,7 @@ import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
 import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
-import { getVector3String } from './utils/stringUtils';
+import { getVector3String, parseVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useMovesActions } from '../store/moves/store';
@@ -12,6 +12,7 @@ import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { getFacingVector } from './utils/touchUtils';
+import { useTouchActions } from '../store/touch/store';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -48,6 +49,7 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
     const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
     const { clearCubieMove } = useMovesActions();
+    const { setPointerLocation, setPointerSelection } = useTouchActions();
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
 
@@ -98,9 +100,18 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
                 onPointerDown={e => {
                     e.stopPropagation();
                     controlsRef.current.enabled = false;
+
                     const posString = e.object?.userData?.posString;
-                    const facing = getFacingVector(e);
-                    console.log('clicked', posString, 'facing', facing);
+                    const facingVector = getFacingVector(e);
+                    console.log('clicked', posString, 'facing', facingVector, e);
+
+                    if (!posString || !facingVector) return;
+
+                    setPointerSelection({
+                        cubiePosition: parseVector3String(posString),
+                        facingVector,
+                    });
+                    setPointerLocation(new THREE.Vector2(e.clientX, e.clientY));
                 }}
                 userData={{ posString }}
             >
