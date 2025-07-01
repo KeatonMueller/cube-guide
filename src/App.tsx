@@ -45,11 +45,13 @@ const Controls = ({ controlsRef }: ControlsProps) => {
         camera.position.y = 3;
         camera.position.z = 6;
 
+        const abortController = new AbortController();
+
         // listen for visibility updates
         const onVisibilityChange = () => {
             setIsVisible(document.visibilityState === 'visible');
         };
-        document.addEventListener('visibilitychange', onVisibilityChange);
+        document.addEventListener('visibilitychange', onVisibilityChange, abortController);
 
         // pointer events
         const onPointerDown = (e: MouseEvent) => {
@@ -59,13 +61,11 @@ const Controls = ({ controlsRef }: ControlsProps) => {
             // console.log('pointer up!', e);
             controlsRef.current.enabled = true;
         };
-        document.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('pointerup', onPointerUp);
+        document.addEventListener('pointerdown', onPointerDown, abortController);
+        document.addEventListener('pointerup', onPointerUp, abortController);
 
         return () => {
-            document.removeEventListener('pointerdown', onPointerDown);
-            document.removeEventListener('pointerup', onPointerUp);
-            document.removeEventListener('visibilitychange', onVisibilityChange);
+            abortController.abort();
         };
     }, []);
 
