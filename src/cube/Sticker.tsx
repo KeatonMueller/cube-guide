@@ -6,7 +6,7 @@ import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesActions, useStickerMoves } from '../store/moves/store';
 import { useFrame, type RootState } from '@react-three/fiber';
-import { useIsVisible } from '../store/visibility/store';
+import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
 
 export type StickerProps = {
@@ -137,6 +137,7 @@ const Sticker = ({ location, color }: StickerProps) => {
             position={[initPosition.x, initPosition.y, initPosition.z]}
             rotation={[initRotation.x, initRotation.y, initRotation.z]}
             ref={stickerRef}
+            userData={{ locationString }}
         >
             <meshBasicMaterial color={color} side={THREE.DoubleSide} />
         </mesh>

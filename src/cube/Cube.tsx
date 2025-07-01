@@ -1,12 +1,17 @@
 import { CUBIE_POSITIONS, MoveMap } from './constants';
 import Cubie from './Cubie';
 import { getVector3String } from './utils/stringUtils';
-import { useEffect } from 'react';
+import { useEffect, type RefObject } from 'react';
 import { useIsActiveMove, useMovesActions, useNextMove } from '../store/moves/store';
 import { keyToMove } from './utils/moveUtils';
 import { useThree } from '@react-three/fiber';
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const Cube = () => {
+export interface CubeProps {
+    controlsRef: RefObject<OrbitControls>;
+}
+
+const Cube = ({ controlsRef }: CubeProps) => {
     const { camera } = useThree();
     const nextMove = useNextMove();
     const isActiveMove = useIsActiveMove();
@@ -39,7 +44,14 @@ const Cube = () => {
     }, []);
 
     return (
-        <group onPointerDown={() => console.log('touch cube')} onPointerUp={() => console.log('release cube')}>
+        <group
+            onPointerDown={e => {
+                e.stopPropagation();
+                const locationString = e.object?.userData?.locationString;
+                console.log('clicked', locationString);
+                controlsRef.current.enabled = false;
+            }}
+        >
             {CUBIE_POSITIONS.map(position => (
                 <Cubie position={position} key={getVector3String(position)} />
             ))}

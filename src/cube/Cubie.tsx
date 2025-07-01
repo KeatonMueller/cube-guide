@@ -8,7 +8,7 @@ import { getVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useMovesActions } from '../store/moves/store';
-import { useIsVisible } from '../store/visibility/store';
+import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
 
 export type CubieProps = {

@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import './styles/styles.css';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { roundedBoxGeometry } from './cube/geometries/roundedBoxGeometry';
 import Cube from './cube/Cube';
-import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { useIsVisible, useVisibilityActions } from './store/visibility/store';
-import { findCameraAxes } from './cube/utils/facingUtils';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { useIsVisible, useConfigActions } from './store/config/store';
 
 const Box = () => {
     const boxRef = useRef<THREE.Mesh>(null!);
@@ -23,14 +22,17 @@ const Box = () => {
     );
 };
 
-const Controls = () => {
-    const controlsRef = useRef<OrbitControls>(null!);
+interface ControlsProps {
+    controlsRef: RefObject<OrbitControls>;
+}
+
+const Controls = ({ controlsRef }: ControlsProps) => {
     const {
         camera,
         gl: { domElement },
     } = useThree();
     const isVisible = useIsVisible();
-    const { setIsVisible } = useVisibilityActions();
+    const { setIsVisible } = useConfigActions();
 
     useFrame(() => {
         if (!isVisible) return;
@@ -55,7 +57,7 @@ const Controls = () => {
         };
         const onPointerUp = (e: MouseEvent) => {
             // console.log('pointer up!', e);
-            console.log(JSON.stringify(findCameraAxes(camera)));
+            controlsRef.current.enabled = true;
         };
         document.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('pointerup', onPointerUp);
@@ -79,15 +81,17 @@ const Controls = () => {
 };
 
 const ThreeScene = () => {
+    const controlsRef = useRef<OrbitControls>(null!);
+
     return (
         <Canvas>
             <ambientLight intensity={1} />
             {/* <ambientLight intensity={0.1} /> */}
             {/* <directionalLight color="red" position={[0, 0, 5]} /> */}
-            <axesHelper args={[10]} />
-            <Controls />
+            {/* <axesHelper args={[10]} /> */}
+            <Controls controlsRef={controlsRef} />
             {/* <Box /> */}
-            <Cube />
+            <Cube controlsRef={controlsRef} />
         </Canvas>
     );
 };
