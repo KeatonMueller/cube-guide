@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Signs, AxisLabels, HALF_PI, type Sign, type DirectedAxis } from '../constants';
+import { SIGNS, AXIS_LABEL, HALF_PI, type Sign, type DirectedAxis } from '../constants';
 import { directedAxisToVector3, roundVector3, vector3ToDirectedAxis } from './vectorUtils';
 
 /**
@@ -53,8 +53,8 @@ const findFrontAxis = (camera: THREE.Object3D): DirectedAxis => {
     let frontAxis: DirectedAxis | null = null;
     let closestDistance = Number.MAX_VALUE;
 
-    for (const axisLabel of AxisLabels) {
-        for (const direction of Signs) {
+    for (const axisLabel of Object.values(AXIS_LABEL)) {
+        for (const direction of SIGNS) {
             const directedAxis = { axisLabel, direction };
             const distance = camera.position.distanceTo(directedAxisToVector3(directedAxis));
             if (distance < closestDistance) {

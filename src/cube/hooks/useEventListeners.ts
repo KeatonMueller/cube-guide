@@ -6,13 +6,14 @@ import { useConfigActions } from '../../store/config/store';
 import { keyToMove } from '../utils/moveUtils';
 import { useMovesActions } from '../../store/moves/store';
 import { useThree } from '@react-three/fiber';
+import { getDragVector } from '../utils/touchUtils';
 
 export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void => {
     const { camera } = useThree();
-    const { queueMove } = useMovesActions();
 
-    const { setIsVisible } = useConfigActions();
     const pointerLocation = usePointerLocation();
+    const { queueMove } = useMovesActions();
+    const { setIsVisible } = useConfigActions();
     const { setPointerLocation, setPointerSelection } = useTouchActions();
 
     // event listeners that don't depend on any state and shouldn't need to be updated
@@ -57,7 +58,9 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
             if (pointerLocation) {
                 const currLocation = new THREE.Vector2(e.clientX, e.clientY);
                 const distance = pointerLocation.distanceTo(currLocation);
-                console.log(distance, 'from', pointerLocation, 'to', currLocation);
+
+                const dragVector = getDragVector(pointerLocation, currLocation);
+                console.log(distance, 'going', dragVector, 'from', pointerLocation, 'to', currLocation);
             }
         };
         document.addEventListener('pointerdown', onPointerDown, abortController);

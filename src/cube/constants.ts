@@ -10,24 +10,30 @@ export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
 export const EPSILON = 0.001;
 export const ANIMATION_SPEED = 7;
 
+type ObjectValues<T> = T[keyof T];
+
 /**
  * Labels for each axis. Values match the property names of THREE.Vector3s.
  */
-export type AxisLabel = 'x' | 'y' | 'z';
-export const AxisLabels: AxisLabel[] = ['x', 'y', 'z'];
+export const AXIS_LABEL = {
+    X: 'x',
+    Y: 'y',
+    Z: 'z',
+} as const;
+export type AxisLabel = ObjectValues<typeof AXIS_LABEL>;
 
 /**
  * Axis vectors
  */
 export const AxisVector: Record<AxisLabel, THREE.Vector3> = {
-    x: new THREE.Vector3(1, 0, 0),
-    y: new THREE.Vector3(0, 1, 0),
-    z: new THREE.Vector3(0, 0, 1),
+    [AXIS_LABEL.X]: new THREE.Vector3(1, 0, 0),
+    [AXIS_LABEL.Y]: new THREE.Vector3(0, 1, 0),
+    [AXIS_LABEL.Z]: new THREE.Vector3(0, 0, 1),
 } as const;
 
 export type AxisValue = -1 | 0 | 1;
 export type Sign = -1 | 1;
-export const Signs: Sign[] = [-1, 1];
+export const SIGNS: Sign[] = [-1, 1];
 
 export type DirectedAxis = {
     axisLabel: AxisLabel;
@@ -109,7 +115,8 @@ export const Color = {
 
 export type Direction = 'clockwise' | 'counterclockwise';
 
-// A move consists of a rotation axis, an axis identifier (-1, 0, 1), and a target theta
+// A move consists of a label of the axis to rotate around, the values (-1, 0, 1) along that
+// axis that will rotate, and a target theta amount to rotate by
 export type Move = {
     axisLabel: AxisLabel;
     axisValues: AxisValue[];
