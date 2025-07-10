@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useCallback, useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
-import { ANIMATION_SPEED, AxisVector, EPSILON, HALF_CUBIE_LENGTH, HALF_PI, type StickerLocation } from './constants';
+import { ANIMATION_SPEED, AxisVector, HALF_CUBIE_LENGTH, HALF_PI, type StickerLocation } from './constants';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesActions, useStickerMoves } from '../store/moves/store';
@@ -17,15 +17,14 @@ export type StickerProps = {
 /**
  * Get the sticker's 3D position given its location.
  * Stickers get rendered in the exact center of a cubie, so they need to be translated
- * an additional half cubie length in the direction they're facing (plus an epsilon so
- * they're not in the exact same plane as the cubie itself).
+ * an additional half cubie length in the direction they're facing.
  */
 const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
     const { cubiePosition, facingVector } = location;
     return new THREE.Vector3(
-        cubiePosition.x + facingVector.x * (HALF_CUBIE_LENGTH + EPSILON),
-        cubiePosition.y + facingVector.y * (HALF_CUBIE_LENGTH + EPSILON),
-        cubiePosition.z + facingVector.z * (HALF_CUBIE_LENGTH + EPSILON)
+        cubiePosition.x + facingVector.x * HALF_CUBIE_LENGTH,
+        cubiePosition.y + facingVector.y * HALF_CUBIE_LENGTH,
+        cubiePosition.z + facingVector.z * HALF_CUBIE_LENGTH
     );
 };
 
@@ -139,7 +138,13 @@ const Sticker = ({ location, color }: StickerProps) => {
             ref={stickerRef}
             userData={{ locationString }}
         >
-            <meshBasicMaterial color={color} side={THREE.DoubleSide} />
+            <meshBasicMaterial
+                color={color}
+                side={THREE.DoubleSide}
+                polygonOffset={true}
+                polygonOffsetFactor={-1}
+                polygonOffsetUnits={1}
+            />
         </mesh>
     );
 };

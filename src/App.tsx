@@ -35,6 +35,13 @@ const Controls = ({ controlsRef }: ControlsProps) => {
             enableDamping={true}
             enableZoom={true}
             enablePan={false}
+            // for some reason, our use of polygonOffset on the sticker and cubie materials to
+            // prevent z-fighting issues doesn't work when the orbit controls are positioned directly
+            // above and directly below the cube
+            // as a hacky solution, prevent the camera from reaching those extremes since this isn't
+            // really noticeable to the user
+            minPolarAngle={0.01}
+            maxPolarAngle={Math.PI - 0.01}
         />
     );
 };

@@ -115,7 +115,12 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
                 }}
                 userData={{ posString }}
             >
-                <meshStandardMaterial color={highlighted ? 'gold' : 'black'} />
+                <meshStandardMaterial
+                    color={highlighted ? 'gold' : 'black'}
+                    polygonOffset={true}
+                    polygonOffsetFactor={1}
+                    polygonOffsetUnits={1}
+                />
             </mesh>
             {stickerPropsList.map(stickerProps => (
                 <Sticker {...stickerProps} key={JSON.stringify(stickerProps)} />
