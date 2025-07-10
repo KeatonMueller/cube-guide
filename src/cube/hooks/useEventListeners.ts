@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { useEffect, type RefObject } from 'react';
 import type { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { usePointerLocation, useTouchActions } from '../../store/touch/store';
+import { usePointerLocation, usePointerSelection, useTouchActions } from '../../store/touch/store';
 import { useConfigActions } from '../../store/config/store';
-import { keyToMove } from '../utils/moveUtils';
+import { dragToMove, keyToMove } from '../utils/moveUtils';
 import { useMovesActions } from '../../store/moves/store';
 import { useThree } from '@react-three/fiber';
 import { getDragVector } from '../utils/touchUtils';
@@ -12,6 +12,7 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
     const { camera } = useThree();
 
     const pointerLocation = usePointerLocation();
+    const pointerSelection = usePointerSelection();
     const { queueMove } = useMovesActions();
     const { setIsVisible } = useConfigActions();
     const { setPointerLocation, setPointerSelection } = useTouchActions();
@@ -55,12 +56,19 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
         };
         const onPointerMove = (e: MouseEvent) => {
             // console.log('pointer move', e);
-            if (pointerLocation) {
+            if (pointerLocation && pointerSelection) {
                 const currLocation = new THREE.Vector2(e.clientX, e.clientY);
+
                 const distance = pointerLocation.distanceTo(currLocation);
+                if (distance < 50) return;
 
                 const dragVector = getDragVector(pointerLocation, currLocation);
-                console.log(distance, 'going', dragVector, 'from', pointerLocation, 'to', currLocation);
+                const move = dragToMove(pointerSelection, dragVector, camera);
+                if (move) {
+                    queueMove(move);
+                    setPointerLocation(null);
+                    setPointerSelection(null);
+                }
             }
         };
         document.addEventListener('pointerdown', onPointerDown, abortController);

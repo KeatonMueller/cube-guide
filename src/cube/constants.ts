@@ -7,10 +7,22 @@ export const HALF_PI = Math.PI * 0.5;
 export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
 export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
-export const EPSILON = 0.001;
 export const ANIMATION_SPEED = 7;
 
 type ObjectValues<T> = T[keyof T];
+
+/**
+ * Labels for each cube face.
+ */
+export const FACE = {
+    UP: 'up',
+    DOWN: 'down',
+    FRONT: 'front',
+    BACK: 'back',
+    RIGHT: 'right',
+    LEFT: 'left',
+} as const;
+export type Face = ObjectValues<typeof FACE>;
 
 /**
  * Labels for each axis. Values match the property names of THREE.Vector3s.

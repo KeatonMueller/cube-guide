@@ -1,6 +1,18 @@
 import * as THREE from 'three';
-import { type Move, type AxisValue, type Direction, type Sign, type DirectedAxis, HALF_PI } from '../constants';
+import {
+    type Move,
+    type AxisValue,
+    type Direction,
+    type Sign,
+    type DirectedAxis,
+    HALF_PI,
+    type StickerLocation,
+    FACE,
+    type Face,
+} from '../constants';
 import { findCameraAxes } from './facingUtils';
+import { getVector3String } from './stringUtils';
+import { directedAxisToVector3 } from './vectorUtils';
 
 /**
  * Check if the given move targets the given position.
@@ -19,6 +31,7 @@ const directedAxisAndDirectionToSign = (directedAxis: DirectedAxis, direction: D
 const OUTER_LAYER_MOVES = ['u', 'd', 'f', 'b', 'r', 'l'];
 const SLICE_MOVES = ['m', 'e', 's'];
 const ROTATION_MOVES = ['x', 'y', 'z'];
+
 /**
  * Based on the given keypress and camera object, return the move (if any) that
  * the key corresponds to.
@@ -85,4 +98,123 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
         axisValues,
         targetTheta: HALF_PI * sign,
     };
+};
+
+/**
+ * Based on the clicked sticker, the direction of the mouse's drag, and the camera position,
+ * find the corresponding move.
+ */
+export const dragToMove = (
+    pointerSelection: StickerLocation,
+    dragVector: THREE.Vector2,
+    camera: THREE.Object3D
+): Move | null => {
+    const { cubiePosition, facingVector } = pointerSelection;
+    const cameraAxes = findCameraAxes(camera);
+
+    const clickedFace: Face = Object.values(FACE).find(face =>
+        directedAxisToVector3(cameraAxes[face]).equals(facingVector)
+    )!;
+    console.log('clicked', clickedFace);
+
+    const info: any = `
+        cubiePosition: ${getVector3String(cubiePosition)}
+        facingVector: ${getVector3String(facingVector)}
+        dragVector: ${dragVector.x},${dragVector.y}
+        cameraAxes: {
+          up: ${JSON.stringify(cameraAxes.up)}
+          down: ${JSON.stringify(cameraAxes.down)}
+          front: ${JSON.stringify(cameraAxes.front)}
+          back: ${JSON.stringify(cameraAxes.back)}
+          right: ${JSON.stringify(cameraAxes.right)}
+          left: ${JSON.stringify(cameraAxes.left)}
+        },
+    `;
+    console.log(info);
+
+    // this is very ugly and I will look for a way to clean it up later
+    // it also doesn't work great when looking at the top or bottom face
+    if (clickedFace === FACE.FRONT) {
+        if (dragVector.y !== 0) {
+            const moveAxis = cameraAxes.right.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: -HALF_PI * dragVector.y * cameraAxes.right.direction,
+            };
+        } else if (dragVector.x !== 0) {
+            const moveAxis = cameraAxes.up.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: HALF_PI * dragVector.x * cameraAxes.up.direction,
+            };
+        }
+    } else if (clickedFace === FACE.RIGHT) {
+        if (dragVector.y !== 0) {
+            const moveAxis = cameraAxes.front.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: HALF_PI * dragVector.y * cameraAxes.front.direction,
+            };
+        } else if (dragVector.x !== 0) {
+            const moveAxis = cameraAxes.up.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: HALF_PI * dragVector.x * cameraAxes.up.direction,
+            };
+        }
+    } else if (clickedFace === FACE.LEFT) {
+        if (dragVector.y !== 0) {
+            const moveAxis = cameraAxes.front.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: -HALF_PI * dragVector.y * cameraAxes.front.direction,
+            };
+        } else if (dragVector.x !== 0) {
+            const moveAxis = cameraAxes.up.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: HALF_PI * dragVector.x * cameraAxes.up.direction,
+            };
+        }
+    } else if (clickedFace === FACE.UP) {
+        if (dragVector.y !== 0) {
+            const moveAxis = cameraAxes.right.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: -HALF_PI * dragVector.y * cameraAxes.right.direction,
+            };
+        } else if (dragVector.x !== 0) {
+            const moveAxis = cameraAxes.front.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: -HALF_PI * dragVector.x * cameraAxes.front.direction,
+            };
+        }
+    } else if (clickedFace === FACE.DOWN) {
+        if (dragVector.y !== 0) {
+            const moveAxis = cameraAxes.right.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: -HALF_PI * dragVector.y * cameraAxes.right.direction,
+            };
+        } else if (dragVector.x !== 0) {
+            const moveAxis = cameraAxes.front.axisLabel;
+            return {
+                axisLabel: moveAxis,
+                axisValues: [cubiePosition[moveAxis] as AxisValue],
+                targetTheta: HALF_PI * dragVector.x * cameraAxes.front.direction,
+            };
+        }
+    }
+
+    return null;
 };

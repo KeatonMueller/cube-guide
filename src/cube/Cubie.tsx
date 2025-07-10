@@ -7,7 +7,7 @@ import Sticker from './Sticker';
 import { getVector3String, parseVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, type RootState } from '@react-three/fiber';
-import { useCubieMoves, useMovesActions } from '../store/moves/store';
+import { useCubieMoves, useIsActiveMove, useMovesActions } from '../store/moves/store';
 import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -48,6 +48,7 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
 
     const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
+    const isActiveMove = useIsActiveMove();
     const { clearCubieMove } = useMovesActions();
     const { setPointerLocation, setPointerSelection } = useTouchActions();
 
@@ -93,19 +94,18 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
                 geometry={roundedBoxGeometry}
                 position={[initPosition.x, initPosition.y, initPosition.z]}
                 ref={cubieRef}
-                onClick={e => {
-                    e.stopPropagation();
-                    setHighlighted(prevHighlighted => !prevHighlighted);
-                }}
+                // onClick={e => {
+                //     e.stopPropagation();
+                //     setHighlighted(prevHighlighted => !prevHighlighted);
+                // }}
                 onPointerDown={e => {
                     e.stopPropagation();
                     controlsRef.current.enabled = false;
 
                     const posString = e.object?.userData?.posString;
                     const facingVector = getFacingVector(e);
-                    console.log('clicked', posString, 'facing', facingVector, e);
 
-                    if (!posString || !facingVector) return;
+                    if (!posString || !facingVector || isActiveMove) return;
 
                     setPointerSelection({
                         cubiePosition: parseVector3String(posString),

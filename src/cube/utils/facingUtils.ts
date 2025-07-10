@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SIGNS, AXIS_LABEL, HALF_PI, type Sign, type DirectedAxis } from '../constants';
+import { SIGNS, AXIS_LABEL, HALF_PI, type Sign, type DirectedAxis, type Face, FACE } from '../constants';
 import { directedAxisToVector3, roundVector3, vector3ToDirectedAxis } from './vectorUtils';
 
 /**
@@ -99,12 +99,7 @@ const findUpAxis = (camera: THREE.Object3D, frontAxis: DirectedAxis): DirectedAx
 };
 
 export type CameraAxes = {
-    up: DirectedAxis;
-    down: DirectedAxis;
-    right: DirectedAxis;
-    left: DirectedAxis;
-    front: DirectedAxis;
-    back: DirectedAxis;
+    [key in Face]: DirectedAxis;
 };
 
 export const findCameraAxes = (camera: THREE.Object3D): CameraAxes => {
@@ -131,11 +126,11 @@ export const findCameraAxes = (camera: THREE.Object3D): CameraAxes => {
     };
 
     return {
-        up,
-        down,
-        right,
-        left,
-        front,
-        back,
+        [FACE.UP]: up,
+        [FACE.DOWN]: down,
+        [FACE.RIGHT]: right,
+        [FACE.LEFT]: left,
+        [FACE.FRONT]: front,
+        [FACE.BACK]: back,
     };
 };

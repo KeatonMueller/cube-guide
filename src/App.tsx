@@ -19,7 +19,7 @@ const Controls = ({ controlsRef }: ControlsProps) => {
     useFrame(() => {
         if (!isVisible) return;
         controlsRef.current.update();
-        // console.log(camera.rotation);
+        console.log(camera.rotation);
     });
 
     useEffect(() => {
