@@ -19,7 +19,7 @@ const Controls = ({ controlsRef }: ControlsProps) => {
     useFrame(() => {
         if (!isVisible) return;
         controlsRef.current.update();
-        console.log(camera.rotation);
+        // console.log(camera.rotation);
     });
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const ThreeScene = () => {
             <ambientLight intensity={1} />
             {/* <ambientLight intensity={0.1} /> */}
             {/* <directionalLight color="red" position={[0, 0, 5]} /> */}
-            {/* <axesHelper args={[10]} /> */}
+            <axesHelper args={[10]} />
             <Controls controlsRef={controlsRef} />
             <Cube controlsRef={controlsRef} />
         </Canvas>
