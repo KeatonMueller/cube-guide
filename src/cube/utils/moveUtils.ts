@@ -16,6 +16,7 @@ import { findCameraAxes } from './facingUtils';
 import { getVector3String } from './stringUtils';
 import { directedAxisToVector3 } from './vectorUtils';
 import type { Camera } from '@react-three/fiber';
+import { getDragVector } from './touchUtils';
 
 /**
  * Check if the given move targets the given position.
@@ -104,13 +105,15 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
 };
 
 /**
- * Based on the clicked sticker, the direction of the mouse's drag, and the camera position,
+ * Based on the clicked sticker, the start and end locations, and the camera position,
  * find the corresponding move.
  */
-export const dragToMove = (
+export const getPointerMove = (
     pointerSelection: StickerLocation,
-    dragVector: THREE.Vector2,
-    camera: Camera
+    initPointerLocation: THREE.Vector2,
+    currPointerLocation: THREE.Vector2,
+    camera: Camera,
+    canvas: HTMLCanvasElement
 ): Move | null => {
     const moveMagnitude = HALF_PI; // radianDistance;
     const { cubiePosition, facingVector } = pointerSelection;
@@ -123,9 +126,23 @@ export const dragToMove = (
     const clickedAxis: AxisLabel = Object.values(AXIS_LABEL).find(
         axisLabel => directedAxisToVector3(cameraAxes[clickedFace])[axisLabel] !== 0
     )!;
-    console.log('clicked', clickedFace, 'which has axis', clickedAxis);
+    const clickedDirectedAxis: DirectedAxis = {
+        axisLabel: clickedAxis,
+        direction: facingVector[clickedAxis] as Sign,
+    };
+
+    const dragVector = getDragVector(
+        initPointerLocation,
+        currPointerLocation,
+        clickedDirectedAxis,
+        cameraAxes,
+        camera,
+        canvas
+    );
 
     const info: any = `
+        clickedFace: ${clickedFace},
+        clickedDirectedAxis: ${JSON.stringify(clickedDirectedAxis)},
         cubiePosition: ${getVector3String(cubiePosition)}
         facingVector: ${getVector3String(facingVector)}
         dragVector: ${dragVector.x},${dragVector.y}

@@ -3,13 +3,15 @@ import { useEffect, type RefObject } from 'react';
 import type { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { usePointerLocation, usePointerSelection, useTouchActions } from '../../store/touch/store';
 import { useConfigActions } from '../../store/config/store';
-import { dragToMove, keyToMove } from '../utils/moveUtils';
+import { getPointerMove, keyToMove } from '../utils/moveUtils';
 import { useMovesActions } from '../../store/moves/store';
 import { useThree } from '@react-three/fiber';
-import { getDragVector } from '../utils/touchUtils';
 
 export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void => {
-    const { camera } = useThree();
+    const {
+        camera,
+        gl: { domElement },
+    } = useThree();
 
     const pointerLocation = usePointerLocation();
     const pointerSelection = usePointerSelection();
@@ -47,7 +49,11 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
 
         const onPointerDown = (e: MouseEvent) => {
             // console.log('pointer down!', e);
+            if (e.buttons === 4) {
+                console.log(e.clientX, e.clientY);
+            }
         };
+        // pointerDown events to initiate the click and drag are initiated on the Cubie.tsx's mesh directly
         const onPointerUp = (e: MouseEvent) => {
             // console.log('pointer up!', e);
             controlsRef.current.enabled = true;
@@ -60,10 +66,9 @@ export const useEventListeners = (controlsRef: RefObject<OrbitControls>): void =
                 const currLocation = new THREE.Vector2(e.clientX, e.clientY);
 
                 const distance = pointerLocation.distanceTo(currLocation);
-                if (distance < 50) return;
+                if (distance < 75) return;
 
-                const dragVector = getDragVector(pointerLocation, currLocation);
-                const move = dragToMove(pointerSelection, dragVector, camera);
+                const move = getPointerMove(pointerSelection, pointerLocation, currLocation, camera, domElement);
                 if (move) {
                     queueMove(move);
                     setPointerLocation(null);

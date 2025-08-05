@@ -27,7 +27,7 @@ import { directedAxisToVector3, roundVector3, vector3ToDirectedAxis } from './ve
  * There is a point where it flips from positive to negative pi, so this map has
  * entries for both of them corresponding to the same directed axis
  */
-const UP_AXIS_ROTATION_MAP: Record<Sign, Record<number, DirectedAxis>> = {
+export const UP_AXIS_ROTATION_MAP: Record<Sign, Record<number, DirectedAxis>> = {
     [1]: {
         [Math.PI]: { axisLabel: 'z', direction: 1 },
         [-Math.PI]: { axisLabel: 'z', direction: 1 },
