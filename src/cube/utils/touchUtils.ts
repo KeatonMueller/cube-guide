@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { Camera, ThreeEvent } from '@react-three/fiber';
-import { AXIS_LABEL, type AxisLabel, type DirectedAxis } from '../constants';
+import { AXIS_LABEL, AxisVector, type AxisLabel, type DirectedAxis, type Sign } from '../constants';
 import { UP_AXIS_ROTATION_MAP, type CameraAxes } from './facingUtils';
 import { directedAxisEqual } from './typeUtils';
 
@@ -53,6 +53,26 @@ const getDragVectorFromMoveVector = (moveVector: THREE.Vector2): THREE.Vector2 =
     return dragVector;
 };
 
+export const getDragNormal = (
+    initPointerPosition: THREE.Vector3,
+    currPointerPosition: THREE.Vector3
+): THREE.Vector3 => {
+    let largestDiff: number = -1;
+    let diffSign: Sign = 1;
+    let diffAxis: AxisLabel = 'x';
+    Object.values(AXIS_LABEL).forEach(axisLabel => {
+        const diff = currPointerPosition[axisLabel] - initPointerPosition[axisLabel];
+        const absDiff = Math.abs(diff);
+        if (absDiff > largestDiff) {
+            largestDiff = absDiff;
+            diffSign = Math.sign(diff) as Sign;
+            diffAxis = axisLabel;
+        }
+    });
+
+    return AxisVector[diffAxis].clone().multiplyScalar(diffSign);
+};
+
 /**
  * For the given initial and current positions of the pointer, return a unit vector
  * representing the direction of the mouse drag.
@@ -83,8 +103,9 @@ export const getDragVector = (
     // first find the theta val that corresponds to the direction the current "up" face is pointing.
     // theta values around a circle have a point where they flip from positive to negative pi, so
     // this list may have 1 or 2 values
+    const upAxis = cameraAxes.up.axisLabel !== 'y' ? cameraAxes.up : cameraAxes.back;
     const upThetas: number[] = Object.entries(UP_AXIS_ROTATION_MAP[clickedDirectedAxis.direction])
-        .filter(([_, directedAxis]) => directedAxisEqual(directedAxis, cameraAxes.up))
+        .filter(([_, directedAxis]) => directedAxisEqual(directedAxis, upAxis))
         .map(([theta, _]) => Number(theta));
 
     // prettier-ignore

@@ -6,7 +6,7 @@ import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants'
 import Sticker from './Sticker';
 import { getVector3String, parseVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
-import { useFrame, type RootState } from '@react-three/fiber';
+import { useFrame, useThree, type RootState } from '@react-three/fiber';
 import { useCubieMoves, useIsActiveMove, useMovesActions } from '../store/moves/store';
 import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
@@ -17,6 +17,7 @@ import { useTouchActions } from '../store/touch/store';
 export type CubieProps = {
     position: THREE.Vector3;
     controlsRef: RefObject<OrbitControls>;
+    raycaster: THREE.Raycaster;
 };
 
 const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
@@ -39,18 +40,23 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
     );
 };
 
-const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
+const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
     const turnProgress = useRef<number>(0);
     // the cubieRef's position stores the real time position of the mesh, while this
     // stores the coordinate location of the mesh, only updated after a move finishes
     const fixedPosition = useRef<THREE.Vector3>(initPosition);
 
+    const {
+        camera,
+        gl: { domElement },
+    } = useThree();
+
     const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
     const isActiveMove = useIsActiveMove();
     const { clearCubieMove } = useMovesActions();
-    const { setPointerLocation, setPointerSelection } = useTouchActions();
+    const { setPointerLocation, setPointerSelection, setPointerPosition } = useTouchActions();
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
 
@@ -105,13 +111,22 @@ const Cubie = ({ position: initPosition, controlsRef }: CubieProps) => {
                     const posString = e.object?.userData?.posString;
                     const facingVector = getFacingVector(e);
 
-                    if (!posString || !facingVector || isActiveMove) return;
+                    const pointer = new THREE.Vector2(
+                        (e.clientX / domElement.clientWidth) * 2 - 1,
+                        -(e.clientY / domElement.clientHeight) * 2 + 1
+                    );
+                    raycaster.setFromCamera(pointer, camera);
+                    const intersection = raycaster.intersectObject(cubieRef.current);
+
+                    if (!posString || !facingVector || !intersection.length || isActiveMove) return;
 
                     setPointerSelection({
                         cubiePosition: parseVector3String(posString),
                         facingVector,
                     });
                     setPointerLocation(new THREE.Vector2(e.clientX, e.clientY));
+                    setPointerPosition(intersection[0].point);
+                    console.log('from', intersection[0].point);
                 }}
                 userData={{ posString }}
             >

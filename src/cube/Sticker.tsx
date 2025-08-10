@@ -19,7 +19,7 @@ export type StickerProps = {
  * Stickers get rendered in the exact center of a cubie, so they need to be translated
  * an additional half cubie length in the direction they're facing.
  */
-const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
+export const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
     const { cubiePosition, facingVector } = location;
     return new THREE.Vector3(
         cubiePosition.x + facingVector.x * HALF_CUBIE_LENGTH,
@@ -36,7 +36,7 @@ const getStickerPosition = (location: StickerLocation): THREE.Vector3 => {
  * This utility, given a unit vector of where the sticker is facing, returns the rotation
  * needed to face the sticker that way (or 180 degrees the other way, since it's the same).
  */
-const getStickerRotation = (facingVector: THREE.Vector3): THREE.Euler => {
+export const getStickerRotation = (facingVector: THREE.Vector3): THREE.Euler => {
     return new THREE.Euler(HALF_PI * facingVector.y, HALF_PI * facingVector.x, 0, THREE.Euler.DEFAULT_ORDER);
 };
 

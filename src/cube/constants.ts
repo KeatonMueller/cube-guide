@@ -52,6 +52,13 @@ export type DirectedAxis = {
     direction: Sign;
 };
 
+export const DIRECTED_AXES: DirectedAxis[] = Object.values(AXIS_LABEL).flatMap(axisLabel =>
+    SIGNS.map(sign => ({
+        axisLabel,
+        direction: sign,
+    }))
+);
+
 /**
  * Positions of all the cubies in 3D space represented as Vector3s.
  */

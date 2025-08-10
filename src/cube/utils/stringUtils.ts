@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import type { StickerLocation } from '../constants';
+import type { AxisLabel, DirectedAxis, Sign, StickerLocation } from '../constants';
 
 export type Vector3String = `${number},${number},${number}`;
 export type StickerLocationString = `${Vector3String}|${Vector3String}`;
+export type DirectedAxisString = `${AxisLabel},${Sign}`;
 
 export const getVector3String = (vector: THREE.Vector3): Vector3String => {
     if (!vector) return '0,0,0';
@@ -26,4 +27,9 @@ export const parseStickerLocationString = (stickerLocationString: StickerLocatio
         cubiePosition: parseVector3String(cubiePositionString),
         facingVector: parseVector3String(facingVectorString),
     };
+};
+
+export const getDirectedAxisString = (directedAxis: DirectedAxis): DirectedAxisString => {
+    if (!directedAxis) return 'x,1';
+    return `${directedAxis.axisLabel},${directedAxis.direction}`;
 };
