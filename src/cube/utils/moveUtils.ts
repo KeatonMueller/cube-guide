@@ -13,7 +13,7 @@ import {
     AXIS_LABEL,
 } from '../constants';
 import { findCameraAxes } from './facingUtils';
-import { getDirectedAxisString, getVector3String, type DirectedAxisString } from './stringUtils';
+import { getDirectedAxisString, getVector3String } from './stringUtils';
 import { directedAxisToVector3 } from './vectorUtils';
 import type { Camera } from '@react-three/fiber';
 import { getDragNormal } from './touchUtils';
@@ -36,70 +36,25 @@ const OUTER_LAYER_MOVES = ['u', 'd', 'f', 'b', 'r', 'l'];
 const SLICE_MOVES = ['m', 'e', 's'];
 const ROTATION_MOVES = ['x', 'y', 'z'];
 
-// TODO: refactor based on defaults to remove need for this huge map
-// moveSignMap[moveAxis][clickedAxis][dragNormal] = moveSign
-const moveSignMap: Record<AxisLabel, Partial<Record<DirectedAxisString, Partial<Record<DirectedAxisString, Sign>>>>> = {
+/**
+ * DEFAULT_MOVE_SIGNS[moveAxis][clickedAxis] = defaultSign
+ * Then multiply defaultSign by clickedAxis sign and drag sign, and the result
+ * will be the sign of the rotation to complete the move.
+ */
+const DEFAULT_MOVE_SIGNS: Record<AxisLabel, Partial<Record<AxisLabel, number>>> = {
     x: {
-        // default -1
-        'z,1': {
-            'y,1': -1,
-            'y,-1': 1,
-        },
-        'z,-1': {
-            'y,-1': -1,
-            'y,1': 1,
-        },
-        // default 1
-        'y,1': {
-            'z,1': 1,
-            'z,-1': -1,
-        },
-        'y,-1': {
-            'z,-1': 1,
-            'z,1': -1,
-        },
+        y: 1,
+        z: -1,
     },
     y: {
-        // default -1
-        'x,1': {
-            'z,1': -1,
-            'z,-1': 1,
-        },
-        'x,-1': {
-            'z,-1': -1,
-            'z,1': 1,
-        },
-        // default 1
-        'z,1': {
-            'x,-1': -1,
-            'x,1': 1,
-        },
-        'z,-1': {
-            'x,1': -1,
-            'x,-1': 1,
-        },
+        x: -1,
+        z: 1,
     },
     z: {
-        // default 1
-        'x,1': {
-            'y,1': 1,
-            'y,-1': -1,
-        },
-        'x,-1': {
-            'y,-1': 1,
-            'y,1': -1,
-        },
-        // default -1
-        'y,1': {
-            'x,1': -1,
-            'x,-1': 1,
-        },
-        'y,-1': {
-            'x,-1': -1,
-            'x,1': 1,
-        },
+        x: 1,
+        y: -1,
     },
-};
+} as const;
 
 /**
  * Based on the given keypress and camera object, return the move (if any) that
@@ -237,7 +192,9 @@ export const getPointerMove = (
     console.log(info, camera);
 
     const moveSign =
-        moveSignMap[moveAxis][getDirectedAxisString(clickedDirectedAxis)]![getDirectedAxisString(dragNormal)]!;
+        DEFAULT_MOVE_SIGNS[moveAxis][clickedDirectedAxis.axisLabel]! *
+        clickedDirectedAxis.direction *
+        dragNormal.direction;
 
     return {
         axisLabel: moveAxis,
