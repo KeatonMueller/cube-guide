@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { useRef, useState, type RefObject } from 'react';
 import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
-import { ANIMATION_SPEED, Color, HALF_PI, STICKER_LOCATIONS } from './constants';
+import { ANIMATION_SPEED, Color, CUBIE_LENGTH, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
 import { getVector3String, parseVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
@@ -42,6 +42,7 @@ const getStickerProps = (cubiePosition: THREE.Vector3): StickerProps[] => {
 
 const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) => {
     const cubieRef = useRef<THREE.Mesh>(null!);
+    const boxRef = useRef<THREE.Mesh>(null!);
     const turnProgress = useRef<number>(0);
     // the cubieRef's position stores the real time position of the mesh, while this
     // stores the coordinate location of the mesh, only updated after a move finishes
@@ -96,39 +97,11 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
 
     return (
         <group>
+            {/* rounded box geometry mesh for visual */}
             <mesh
                 geometry={roundedBoxGeometry}
                 position={[initPosition.x, initPosition.y, initPosition.z]}
                 ref={cubieRef}
-                // onClick={e => {
-                //     e.stopPropagation();
-                //     setHighlighted(prevHighlighted => !prevHighlighted);
-                // }}
-                onPointerDown={e => {
-                    e.stopPropagation();
-                    controlsRef.current.enabled = false;
-
-                    const posString = e.object?.userData?.posString;
-                    const facingVector = getFacingVector(e);
-
-                    const pointer = new THREE.Vector2(
-                        (e.clientX / domElement.clientWidth) * 2 - 1,
-                        -(e.clientY / domElement.clientHeight) * 2 + 1
-                    );
-                    raycaster.setFromCamera(pointer, camera);
-                    const intersection = raycaster.intersectObject(cubieRef.current);
-
-                    if (!posString || !facingVector || !intersection.length || isActiveMove) return;
-
-                    setPointerSelection({
-                        cubiePosition: parseVector3String(posString),
-                        facingVector,
-                    });
-                    setPointerLocation(new THREE.Vector2(e.clientX, e.clientY));
-                    setPointerPosition(intersection[0].point);
-                    console.log('from', intersection[0].point);
-                }}
-                userData={{ posString }}
             >
                 <meshStandardMaterial
                     color={highlighted ? 'gold' : 'black'}
@@ -136,6 +109,34 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
                     polygonOffsetFactor={1}
                     polygonOffsetUnits={1}
                 />
+            </mesh>
+            {/* standard box geometry mesh for click detection */}
+            <mesh
+                ref={boxRef}
+                position={[initPosition.x, initPosition.y, initPosition.z]}
+                onPointerDown={e => {
+                    e.stopPropagation();
+                    controlsRef.current.enabled = false;
+                    console.log('cubie', getVector3String(initPosition));
+                    const facingVector = getFacingVector(e);
+                    const pointer = new THREE.Vector2(
+                        (e.clientX / domElement.clientWidth) * 2 - 1,
+                        -(e.clientY / domElement.clientHeight) * 2 + 1
+                    );
+                    raycaster.setFromCamera(pointer, camera);
+                    const intersection = raycaster.intersectObject(boxRef.current);
+                    if (!facingVector || !intersection.length || isActiveMove) return;
+                    setPointerSelection({
+                        cubiePosition: initPosition,
+                        facingVector,
+                    });
+                    setPointerLocation(new THREE.Vector2(e.clientX, e.clientY));
+                    setPointerPosition(intersection[0].point);
+                    console.log('from', intersection[0].point);
+                }}
+            >
+                <boxGeometry args={[CUBIE_LENGTH, CUBIE_LENGTH, CUBIE_LENGTH]} />
+                <meshStandardMaterial transparent={true} opacity={0} />
             </mesh>
             {stickerPropsList.map(stickerProps => (
                 <Sticker {...stickerProps} key={JSON.stringify(stickerProps)} />

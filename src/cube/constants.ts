@@ -7,7 +7,7 @@ export const HALF_PI = Math.PI * 0.5;
 export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
 export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
-export const ANIMATION_SPEED = 7;
+export const ANIMATION_SPEED = 8;
 
 type ObjectValues<T> = T[keyof T];
 
