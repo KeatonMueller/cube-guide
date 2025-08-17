@@ -8,6 +8,7 @@ export const CUBIE_LENGTH = 1;
 export const HALF_CUBIE_LENGTH = CUBIE_LENGTH * 0.5;
 export const STICKER_LENGTH = CUBIE_LENGTH * 0.85;
 export const ANIMATION_SPEED = 8;
+export const MOVE_THRESHOLD = HALF_CUBIE_LENGTH;
 
 type ObjectValues<T> = T[keyof T];
 

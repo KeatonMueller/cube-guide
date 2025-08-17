@@ -11,12 +11,14 @@ import {
     type Face,
     type AxisLabel,
     AXIS_LABEL,
+    MOVE_THRESHOLD,
 } from '../constants';
 import { findCameraAxes } from './facingUtils';
 import { getDirectedAxisString, getVector3String } from './stringUtils';
 import { directedAxisToVector3 } from './vectorUtils';
 import type { Camera } from '@react-three/fiber';
 import { getDragNormal } from './touchUtils';
+import { updateRaycaster } from './raycasterUtils';
 
 /**
  * Check if the given move targets the given position.
@@ -131,8 +133,6 @@ export const keyToMove = (key: string, camera: THREE.Object3D): Move | null => {
 export const getPointerMove = (
     initPointerPosition: THREE.Vector3,
     pointerSelection: StickerLocation,
-    _1: THREE.Vector2,
-    _2: THREE.Vector2,
     camera: Camera,
     canvas: HTMLCanvasElement,
     raycaster: THREE.Raycaster,
@@ -146,7 +146,6 @@ export const getPointerMove = (
     const clickedFace: Face = Object.values(FACE).find(face =>
         directedAxisToVector3(cameraAxes[face]).equals(facingVector)
     )!;
-
     const clickedAxis: AxisLabel = Object.values(AXIS_LABEL).find(
         axisLabel => directedAxisToVector3(cameraAxes[clickedFace])[axisLabel] !== 0
     )!;
@@ -155,15 +154,14 @@ export const getPointerMove = (
         direction: facingVector[clickedAxis] as Sign,
     };
 
-    const pointer = new THREE.Vector2(
-        (e.clientX / canvas.clientWidth) * 2 - 1,
-        -(e.clientY / canvas.clientHeight) * 2 + 1
-    );
-    raycaster.setFromCamera(pointer, camera);
+    updateRaycaster(e, canvas, camera, raycaster);
     const plane = planes[getDirectedAxisString(clickedDirectedAxis)];
     const intersection = raycaster.intersectObject(plane);
     const currPointerPosition = intersection[0].point;
-    console.log('to', currPointerPosition);
+
+    if (initPointerPosition.distanceTo(currPointerPosition) < MOVE_THRESHOLD) {
+        return null;
+    }
 
     const dragNormal = getDragNormal(initPointerPosition, currPointerPosition);
 
@@ -189,7 +187,7 @@ export const getPointerMove = (
           left: ${JSON.stringify(cameraAxes.left)}
         },
     `;
-    console.log(info, camera);
+    console.log(info);
 
     const moveSign =
         DEFAULT_MOVE_SIGNS[moveAxis][clickedDirectedAxis.axisLabel]! *

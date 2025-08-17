@@ -13,6 +13,7 @@ import { getRotationMatrix } from './utils/rotationUtils';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { getFacingVector } from './utils/touchUtils';
 import { useTouchActions } from '../store/touch/store';
+import { updateRaycaster } from './utils/raycasterUtils';
 
 export type CubieProps = {
     position: THREE.Vector3;
@@ -56,7 +57,7 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
     const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
     const { clearCubieMove } = useMovesActions();
-    const { setPointerLocation, setPointerSelection, setPointerPosition } = useTouchActions();
+    const { setPointerSelection, setPointerPosition } = useTouchActions();
 
     const [highlighted, setHighlighted] = useState<boolean>(false);
 
@@ -116,22 +117,18 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
                 onPointerDown={e => {
                     e.stopPropagation();
                     controlsRef.current.enabled = false;
-                    console.log('cubie', getVector3String(initPosition));
+
                     const facingVector = getFacingVector(e);
-                    const pointer = new THREE.Vector2(
-                        (e.clientX / domElement.clientWidth) * 2 - 1,
-                        -(e.clientY / domElement.clientHeight) * 2 + 1
-                    );
-                    raycaster.setFromCamera(pointer, camera);
+                    updateRaycaster(e, domElement, camera, raycaster);
                     const intersection = raycaster.intersectObject(boxRef.current);
+
                     if (!facingVector || !intersection.length) return;
+
                     setPointerSelection({
                         cubiePosition: initPosition,
                         facingVector,
                     });
-                    setPointerLocation(new THREE.Vector2(e.clientX, e.clientY));
                     setPointerPosition(intersection[0].point);
-                    console.log('from', intersection[0].point);
                 }}
             >
                 <boxGeometry args={[CUBIE_LENGTH, CUBIE_LENGTH, CUBIE_LENGTH]} />
