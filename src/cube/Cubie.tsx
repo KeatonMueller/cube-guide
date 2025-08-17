@@ -4,10 +4,10 @@ import { roundedBoxGeometry } from './geometries/roundedBoxGeometry';
 import type { StickerProps } from './Sticker';
 import { ANIMATION_SPEED, Color, CUBIE_LENGTH, HALF_PI, STICKER_LOCATIONS } from './constants';
 import Sticker from './Sticker';
-import { getVector3String, parseVector3String } from './utils/stringUtils';
+import { getVector3String } from './utils/stringUtils';
 import { roundVector3 } from './utils/vectorUtils';
 import { useFrame, useThree, type RootState } from '@react-three/fiber';
-import { useCubieMoves, useIsActiveMove, useMovesActions } from '../store/moves/store';
+import { useCubieMoves, useMovesActions } from '../store/moves/store';
 import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -55,7 +55,6 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
 
     const isVisible = useIsVisible();
     const cubieMoves = useCubieMoves();
-    const isActiveMove = useIsActiveMove();
     const { clearCubieMove } = useMovesActions();
     const { setPointerLocation, setPointerSelection, setPointerPosition } = useTouchActions();
 
@@ -125,7 +124,7 @@ const Cubie = ({ position: initPosition, controlsRef, raycaster }: CubieProps) =
                     );
                     raycaster.setFromCamera(pointer, camera);
                     const intersection = raycaster.intersectObject(boxRef.current);
-                    if (!facingVector || !intersection.length || isActiveMove) return;
+                    if (!facingVector || !intersection.length) return;
                     setPointerSelection({
                         cubiePosition: initPosition,
                         facingVector,
