@@ -187,7 +187,7 @@ export const getPointerMove = (
           left: ${JSON.stringify(cameraAxes.left)}
         },
     `;
-    console.log(info);
+    // console.log(info);
 
     const moveSign =
         DEFAULT_MOVE_SIGNS[moveAxis][clickedDirectedAxis.axisLabel]! *

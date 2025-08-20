@@ -45,10 +45,14 @@ STICKER_LOCATION_STRINGS.forEach(locationString => {
 const useMovesStore = create<MovesState>(set => ({
     ...initialState,
     actions: {
-        queueMove: (move: Move) => set(state => ({ moveBuffer: [...state.moveBuffer, move] })),
+        queueMove: (move: Move) => {
+            console.log('queue', move);
+            set(state => ({ moveBuffer: [...state.moveBuffer, move] }));
+        },
         dequeueMove: () => set(state => ({ moveBuffer: state.moveBuffer.slice(1) })),
         clearMoves: () => set(() => ({ moveBuffer: [] })),
-        executeMove: (move: Move) =>
+        executeMove: (move: Move) => {
+            console.log('execute', move);
             set(state => {
                 const cubieMoves: MoveMap = {};
                 CUBIE_POSITIONS.forEach(position => {
@@ -75,7 +79,8 @@ const useMovesStore = create<MovesState>(set => ({
                         ...stickerMoves,
                     },
                 };
-            }),
+            });
+        },
         clearCubieMove: (posString: string) =>
             set(state => ({
                 ...state,

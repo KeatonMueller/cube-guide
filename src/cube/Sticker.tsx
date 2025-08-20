@@ -86,18 +86,19 @@ const Sticker = ({ location, color }: StickerProps) => {
             facingVector: nextFacingVector,
         };
 
-        const nextStickerPosition = getStickerPosition(nextLocation);
-        stickerRef.current.position.copy(nextStickerPosition);
+        stickerRef.current.position.copy(getStickerPosition(nextLocation));
         stickerRef.current.rotateOnWorldAxis(AxisVector[axisLabel], deltaTheta);
         realTimeLocation.current = nextLocation;
 
         turnProgress.current += deltaTheta;
 
-        if (Math.abs(turnProgress.current) >= Math.abs(targetTheta)) {
+        if (Math.abs(turnProgress.current + deltaTheta) >= Math.abs(targetTheta)) {
             // if the animation that just completed was a full quarter turn,
             // round the current position vector and store it
             if (Math.abs(targetTheta) === HALF_PI) {
                 performTurn();
+            } else {
+                console.error('This should never happen, sticker target theta was', targetTheta);
             }
             // reset theta trackers and flag move as complete
             turnProgress.current = 0;
@@ -121,10 +122,8 @@ const Sticker = ({ location, color }: StickerProps) => {
             facingVector: nextFacingVector,
         };
 
-        const nextStickerPosition = getStickerPosition(nextLocation);
-        const nextStickerRotation = getStickerRotation(nextFacingVector);
-        stickerRef.current.position.copy(nextStickerPosition);
-        stickerRef.current.rotation.copy(nextStickerRotation);
+        stickerRef.current.position.copy(getStickerPosition(nextLocation));
+        stickerRef.current.rotation.copy(getStickerRotation(nextFacingVector));
 
         realTimeLocation.current = nextLocation;
         fixedLocation.current = nextLocation;
