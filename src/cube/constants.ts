@@ -124,13 +124,26 @@ export const STICKER_LOCATION_STRINGS: string[] = STICKER_LOCATIONS.map(stickerL
     getStickerLocationString(stickerLocation)
 );
 
-export const Color = {
-    WHITE: 0xffffff,
-    YELLOW: 0xffff00,
-    RED: 0xff0000,
-    ORANGE: 0xff9900,
-    BLUE: 0x0000ff,
-    GREEN: 0x00ff00,
+// because we want to support recoloring the cube eventually, these are
+// static labels for each sticker color
+export const COLOR_LABEL = {
+    WHITE: 'white',
+    YELLOW: 'yellow',
+    RED: 'red',
+    ORANGE: 'orange',
+    BLUE: 'blue',
+    GREEN: 'green',
+} as const;
+export type ColorLabel = ObjectValues<typeof COLOR_LABEL>;
+
+// map from the sticker color's label to hex value for displaying it
+export const ColorMap: Record<ColorLabel, number> = {
+    [COLOR_LABEL.WHITE]: 0xffffff,
+    [COLOR_LABEL.YELLOW]: 0xffff00,
+    [COLOR_LABEL.RED]: 0xff0000,
+    [COLOR_LABEL.ORANGE]: 0xff9900,
+    [COLOR_LABEL.BLUE]: 0x0000ff,
+    [COLOR_LABEL.GREEN]: 0x00ff00,
 } as const;
 
 export type Direction = 'clockwise' | 'counterclockwise';

@@ -1,7 +1,15 @@
 import * as THREE from 'three';
 import { useCallback, useRef } from 'react';
 import { roundedSquareGeometry } from './geometries/roundedSquareGeometry';
-import { ANIMATION_SPEED, AxisVector, HALF_CUBIE_LENGTH, HALF_PI, type StickerLocation } from './constants';
+import {
+    ANIMATION_SPEED,
+    AxisVector,
+    ColorMap,
+    HALF_CUBIE_LENGTH,
+    HALF_PI,
+    type ColorLabel,
+    type StickerLocation,
+} from './constants';
 import { getStickerLocationString } from './utils/stringUtils';
 import { applyMatrix3AndRound } from './utils/vectorUtils';
 import { useMovesActions, useStickerMoves } from '../store/moves/store';
@@ -11,7 +19,7 @@ import { getRotationMatrix } from './utils/rotationUtils';
 
 export type StickerProps = {
     location: StickerLocation;
-    color: number;
+    colorLabel: ColorLabel;
 };
 
 /**
@@ -40,7 +48,7 @@ export const getStickerRotation = (facingVector: THREE.Vector3): THREE.Euler => 
     return new THREE.Euler(HALF_PI * facingVector.y, HALF_PI * facingVector.x, 0, THREE.Euler.DEFAULT_ORDER);
 };
 
-const Sticker = ({ location, color }: StickerProps) => {
+const Sticker = ({ location, colorLabel }: StickerProps) => {
     // initial position and rotation based on props
     // all future values are stored in local state and refs
     const initPosition = getStickerPosition(location);
@@ -138,7 +146,7 @@ const Sticker = ({ location, color }: StickerProps) => {
             userData={{ locationString }}
         >
             <meshBasicMaterial
-                color={color}
+                color={ColorMap[colorLabel]}
                 side={THREE.DoubleSide}
                 polygonOffset={true}
                 polygonOffsetFactor={-1}
