@@ -7,6 +7,7 @@ import { useIsActiveMove, useMovesActions, useNextMove } from '../store/moves/st
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useEventListeners } from './hooks/useEventListeners';
 import Plane from './Plane';
+import { useRepr } from '../store/repr/store';
 
 export interface CubeProps {
     controlsRef: RefObject<OrbitControls>;
@@ -15,6 +16,7 @@ export interface CubeProps {
 const Cube = ({ controlsRef }: CubeProps) => {
     const nextMove = useNextMove();
     const isActiveMove = useIsActiveMove();
+    const repr = useRepr();
     const { executeMove, dequeueMove } = useMovesActions();
 
     const raycaster = new THREE.Raycaster();
@@ -28,6 +30,22 @@ const Cube = ({ controlsRef }: CubeProps) => {
             dequeueMove();
         }
     }, [shouldExecuteNextMove, nextMove]);
+
+    useEffect(() => {
+        let reprString = '';
+        for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 3; j++) {
+                let line = '';
+                for (let k = 0; k < 3; k++) {
+                    const idx = i * 9 + j * 3 + k;
+                    line += repr.charAt(idx);
+                }
+                reprString += line + '\n';
+            }
+            reprString += '\n';
+        }
+        console.log(reprString);
+    }, [repr]);
 
     return (
         <group>

@@ -16,6 +16,7 @@ import { useMovesActions, useStickerMoves } from '../store/moves/store';
 import { useFrame, type RootState } from '@react-three/fiber';
 import { useIsVisible } from '../store/config/store';
 import { getRotationMatrix } from './utils/rotationUtils';
+import { useReprActions } from '../store/repr/store';
 
 export type StickerProps = {
     location: StickerLocation;
@@ -70,9 +71,12 @@ const Sticker = ({ location, colorLabel }: StickerProps) => {
     const isVisible = useIsVisible();
     const stickerMoves = useStickerMoves();
     const { clearStickerMove } = useMovesActions();
+    const { updateRepr } = useReprActions();
 
     const locationString = getStickerLocationString(fixedLocation.current);
     const move = stickerMoves[locationString];
+
+    updateRepr(location, colorLabel);
 
     // every frame, animate the ongoing turn if there is one
     useFrame((_: RootState, delta: number) => {
@@ -135,6 +139,7 @@ const Sticker = ({ location, colorLabel }: StickerProps) => {
 
         realTimeLocation.current = nextLocation;
         fixedLocation.current = nextLocation;
+        updateRepr(fixedLocation.current, colorLabel);
     }, [move, fixedLocation, stickerRef.current]);
 
     return (

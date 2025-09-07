@@ -127,12 +127,12 @@ export const STICKER_LOCATION_STRINGS: string[] = STICKER_LOCATIONS.map(stickerL
 // because we want to support recoloring the cube eventually, these are
 // static labels for each sticker color
 export const COLOR_LABEL = {
-    WHITE: 'white',
-    YELLOW: 'yellow',
-    RED: 'red',
-    ORANGE: 'orange',
-    BLUE: 'blue',
-    GREEN: 'green',
+    WHITE: 'W',
+    YELLOW: 'Y',
+    RED: 'R',
+    ORANGE: 'O',
+    BLUE: 'B',
+    GREEN: 'G',
 } as const;
 export type ColorLabel = ObjectValues<typeof COLOR_LABEL>;
 
